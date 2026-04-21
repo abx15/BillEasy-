@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: billeasy
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - billeasy_network
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - billeasy_network
+
+  api:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.api
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - billeasy_network
+
+  ml-api:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.ml
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    networks:
+      - billeasy_network
+
+  web:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.web
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    depends_on:
+      - api
+    networks:
+      - billeasy_network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  billeasy_network:
+    driver: bridge

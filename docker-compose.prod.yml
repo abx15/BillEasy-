@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: infra/docker/api.Dockerfile
+    container_name: billeasy-api
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env.production
+    restart: always
+
+  ml-api:
+    build:
+      context: .
+      dockerfile: infra/docker/ml-api.Dockerfile
+    container_name: billeasy-ml-api
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env.production
+    restart: always
+
+  web:
+    build:
+      context: .
+      dockerfile: infra/docker/web.Dockerfile
+    container_name: billeasy-web
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.production
+    restart: always
