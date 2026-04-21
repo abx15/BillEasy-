@@ -1,0 +1,152 @@
+// Prisma Schema - Complete database models for BillEasy
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  OWNER
+  MANAGER
+  STAFF
+}
+
+enum PaymentStatus {
+  PAID
+  PENDING
+  PARTIAL
+}
+
+enum PaymentMethod {
+  CASH
+  UPI
+  CARD
+  CREDIT
+}
+
+model Business {
+  id            String   @id @default(cuid())
+  name          String
+  ownerName     String
+  phone         String
+  email         String
+  gstNumber     String?
+  address       String?
+  logoUrl       String?
+  invoicePrefix String   @default("INV")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  users      User[]
+  customers  Customer[]
+  products   Product[]
+  bills      Bill[]
+
+  @@map("businesses")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  businessId String
+  name      String
+  email     String   @unique
+  password  String
+  role      UserRole @default(STAFF)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@map("users")
+}
+
+model Customer {
+  id           String   @id @default(cuid())
+  businessId   String
+  name         String
+  phone        String
+  email        String?
+  address      String?
+  totalCredit  Float    @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  bills    Bill[]
+
+  @@map("customers")
+}
+
+model Product {
+  id             String   @id @default(cuid())
+  businessId     String
+  name           String
+  sku            String?
+  price          Float
+  gstPercent     Float    @default(0)
+  stockQuantity  Int      @default(0)
+  lowStockAlert  Int      @default(10)
+  unit           String?
+  category       String?
+  expiryDate     DateTime?
+  batchNumber    String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  billItems BillItem[]
+
+  @@map("products")
+}
+
+model Bill {
+  id             String         @id @default(cuid())
+  businessId     String
+  customerId     String
+  invoiceNumber  String
+  subtotal       Float
+  discountAmount Float          @default(0)
+  gstAmount      Float
+  totalAmount    Float
+  paymentStatus  PaymentStatus  @default(PENDING)
+  paymentMethod  PaymentMethod?
+  notes          String?
+  createdAt      DateTime       @default(now())
+
+  business Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  customer Customer  @relation(fields: [customerId], references: [id])
+  items    BillItem[]
+  payments Payment[]
+
+  @@unique([businessId, invoiceNumber])
+  @@map("bills")
+}
+
+model BillItem {
+  id        String @id @default(cuid())
+  billId    String
+  productId String
+  quantity  Int
+  price     Float
+  gstAmount Float
+
+  bill    Bill    @relation(fields: [billId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("bill_items")
+}
+
+model Payment {
+  id       String @id @default(cuid())
+  billId   String
+  amount   Float
+  method   PaymentMethod
+  paidAt   DateTime @default(now())
+
+  bill Bill @relation(fields: [billId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
