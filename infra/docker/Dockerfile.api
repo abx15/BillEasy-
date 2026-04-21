@@ -1,0 +1,2 @@
+# Dockerfile for NestJS API
+FROM node:18-alpine

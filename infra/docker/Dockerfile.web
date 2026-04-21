@@ -1,0 +1,2 @@
+# Dockerfile for Next.js Web App
+FROM node:18-alpine
