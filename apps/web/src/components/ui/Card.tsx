@@ -6,16 +6,29 @@ import { ReactNode } from 'react'
 interface CardProps {
   children: ReactNode
   className?: string
+  variant?: 'default' | 'glass' | 'outline'
+  noPadding?: boolean
 }
 
-export function Card({ children, className }: CardProps) {
+export function Card({ 
+  children, 
+  className, 
+  variant = 'default',
+  noPadding = false 
+}: CardProps) {
+  const variants = {
+    default: 'bg-white border-gray-200 shadow-soft hover:shadow-medium',
+    glass: 'bg-white/70 backdrop-blur-md border border-white/20 shadow-soft',
+    outline: 'bg-transparent border-gray-200',
+  }
+
   return (
-    <div
-      className={cn(
-        'rounded-xl border border-border bg-card text-card-foreground shadow-sm',
-        className
-      )}
-    >
+    <div className={cn(
+      'rounded-[1rem] border transition-all duration-300 overflow-hidden',
+      variants[variant],
+      !noPadding && 'p-6',
+      className
+    )}>
       {children}
     </div>
   )
@@ -39,7 +52,7 @@ export function CardContent({ children, className }: CardProps) {
 
 export function CardFooter({ children, className }: CardProps) {
   return (
-    <div className={cn('p-6 pt-4 border-t border-border', className)}>
+    <div className={cn('p-6 pt-4 border-t border-gray-200', className)}>
       {children}
     </div>
   )
