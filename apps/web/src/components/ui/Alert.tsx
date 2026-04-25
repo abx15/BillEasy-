@@ -1,57 +1,71 @@
 'use client'
 
+import * as React from 'react'
+import { cva, type VariantProps } from 'class-variance-authority'
+import { AlertCircle, CheckCircle2, Info, XCircle, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { AlertCircle, CheckCircle, Info, X } from 'lucide-react'
-import { ReactNode } from 'react'
 
-interface AlertProps {
-  variant?: 'default' | 'destructive' | 'success' | 'warning'
-  className?: string
-  children: ReactNode
-  dismissible?: boolean
-  onDismiss?: () => void
+const alertVariants = cva(
+  'relative w-full rounded-2xl p-4 flex gap-3 transition-all duration-300 border shadow-soft',
+  {
+    variants: {
+      variant: {
+        default: 'bg-white border-slate-200 text-slate-900',
+        destructive: 'bg-rose-50 border-rose-100 text-rose-900',
+        success: 'bg-emerald-50 border-emerald-100 text-emerald-900',
+        warning: 'bg-amber-50 border-amber-100 text-amber-900',
+        info: 'bg-blue-50 border-blue-100 text-blue-900',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+    },
+  }
+)
+
+const icons = {
+  default: Info,
+  destructive: AlertCircle,
+  success: CheckCircle2,
+  warning: AlertCircle,
+  info: Info,
 }
 
-const alertVariants = {
-  variant: {
-    default: 'bg-background text-foreground border-border',
-    destructive: 'bg-destructive/10 text-destructive border-destructive/20',
-    success: 'bg-success/10 text-success border-success/20',
-    warning: 'bg-warning/10 text-warning border-warning/20',
-  },
-  icon: {
-    default: Info,
-    destructive: AlertCircle,
-    success: CheckCircle,
-    warning: AlertCircle,
-  },
+export interface AlertProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof alertVariants> {
+  onClose?: () => void
 }
 
-export function Alert({ variant = 'default', className, children, dismissible = false, onDismiss }: AlertProps) {
-  const Icon = alertVariants.icon[variant]
+const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
+  ({ className, variant = 'default', children, onClose, ...props }, ref) => {
+    const Icon = icons[variant as keyof typeof icons] || Info
 
-  return (
-    <div
-      className={cn(
-        'relative flex items-start gap-3 rounded-lg border p-4',
-        alertVariants.variant[variant],
-        className
-      )}
-    >
-      <Icon className="h-4 w-4 mt-0.5 flex-shrink-0" />
-      <div className="flex-1 text-sm">{children}</div>
-      {dismissible && (
-        <button
-          onClick={onDismiss}
-          className="flex-shrink-0 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-        >
-          <X className="h-4 w-4" />
-        </button>
-      )}
-    </div>
-  )
-}
+    return (
+      <div
+        ref={ref}
+        role="alert"
+        className={cn(alertVariants({ variant }), className)}
+        {...props}
+      >
+        <div className="flex-shrink-0">
+          <Icon className="h-5 w-5 opacity-90" />
+        </div>
+        <div className="flex-1 text-sm font-semibold leading-relaxed">
+          {children}
+        </div>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="flex-shrink-0 ml-auto hover:opacity-70 transition-opacity"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
+      </div>
+    )
+  }
+)
+Alert.displayName = 'Alert'
 
-export function AlertDescription({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cn('text-sm opacity-90', className)}>{children}</div>
-}
+export { Alert }
