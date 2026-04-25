@@ -1,11 +1,21 @@
-// Prisma Seed - Demo data for BillEasy
 import { PrismaClient } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
+import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('Starting seed...');
+
+  // Clear existing data
+  console.log('🗑️ Clearing existing data...');
+  await prisma.payment.deleteMany();
+  await prisma.billItem.deleteMany();
+  await prisma.bill.deleteMany();
+  await prisma.product.deleteMany();
+  await prisma.category.deleteMany();
+  await prisma.customer.deleteMany();
+  await prisma.user.deleteMany();
+  await prisma.business.deleteMany();
 
   // Create demo business
   const business = await prisma.business.create({
@@ -16,7 +26,6 @@ async function main() {
       email: 'rajesh@mediplus.in',
       gstNumber: '27AAAPL1234C1ZV',
       address: '123 MG Road, Bangalore, Karnataka - 560001',
-      invoicePrefix: 'MED',
     },
   });
 
@@ -27,14 +36,31 @@ async function main() {
   const user = await prisma.user.create({
     data: {
       businessId: business.id,
-      name: 'Dr. Rajesh Kumar',
+      firstName: 'Rajesh',
+      lastName: 'Kumar',
       email: 'rajesh@mediplus.in',
-      password: hashedPassword,
+      passwordHash: hashedPassword,
       role: 'OWNER',
     },
   });
 
   console.log('Created user:', user.email);
+
+  const categoryMedical = await prisma.category.create({
+    data: {
+      name: 'Medicines',
+      businessId: business.id,
+      gstSlab: 'TWELVE',
+    }
+  });
+
+  const categoryGeneral = await prisma.category.create({
+    data: {
+      name: 'General',
+      businessId: business.id,
+      gstSlab: 'EIGHTEEN',
+    }
+  });
 
   // Create sample products (mix of medical and general items)
   const products = [
@@ -43,125 +69,61 @@ async function main() {
       name: 'Paracetamol 500mg',
       sku: 'MED001',
       price: 15.50,
-      gstPercent: 12,
+      costPrice: 10.00,
+      gstSlab: 'TWELVE',
       stockQuantity: 100,
-      lowStockAlert: 20,
+      minStockLevel: 20,
       unit: 'strips',
-      category: 'Medicines',
-      expiryDate: new Date('2025-12-31'),
-      batchNumber: 'P2024001',
+      categoryId: categoryMedical.id,
     },
     {
       name: 'Dolo 650mg',
       sku: 'MED002',
       price: 25.00,
-      gstPercent: 12,
+      costPrice: 15.00,
+      gstSlab: 'TWELVE',
       stockQuantity: 50,
-      lowStockAlert: 15,
+      minStockLevel: 15,
       unit: 'strips',
-      category: 'Medicines',
-      expiryDate: new Date('2025-08-15'),
-      batchNumber: 'D2024002',
-    },
-    {
-      name: 'Azithromycin 250mg',
-      sku: 'MED003',
-      price: 120.00,
-      gstPercent: 12,
-      stockQuantity: 30,
-      lowStockAlert: 10,
-      unit: 'strips',
-      category: 'Antibiotics',
-      expiryDate: new Date('2025-06-30'),
-      batchNumber: 'A2024003',
-    },
-    {
-      name: 'Volini Spray',
-      sku: 'MED004',
-      price: 180.00,
-      gstPercent: 18,
-      stockQuantity: 25,
-      lowStockAlert: 8,
-      unit: 'pieces',
-      category: 'Pain Relief',
-      expiryDate: new Date('2025-10-20'),
-      batchNumber: 'V2024004',
-    },
-    {
-      name: 'Betadine Solution',
-      sku: 'MED005',
-      price: 85.00,
-      gstPercent: 18,
-      stockQuantity: 40,
-      lowStockAlert: 12,
-      unit: 'bottles',
-      category: 'Antiseptics',
-      expiryDate: new Date('2026-01-15'),
-      batchNumber: 'B2024005',
+      categoryId: categoryMedical.id,
     },
     // General items
     {
       name: 'Hand Sanitizer',
       sku: 'GEN001',
       price: 45.00,
-      gstPercent: 18,
+      costPrice: 25.00,
+      gstSlab: 'EIGHTEEN',
       stockQuantity: 60,
-      lowStockAlert: 20,
+      minStockLevel: 20,
       unit: 'bottles',
-      category: 'General',
+      categoryId: categoryGeneral.id,
     },
     {
       name: 'Face Mask',
       sku: 'GEN002',
       price: 10.00,
-      gstPercent: 12,
+      costPrice: 5.00,
+      gstSlab: 'TWELVE',
       stockQuantity: 200,
-      lowStockAlert: 50,
+      minStockLevel: 50,
       unit: 'pieces',
-      category: 'General',
-    },
-    {
-      name: 'Gloves (Latex)',
-      sku: 'GEN003',
-      price: 25.00,
-      gstPercent: 18,
-      stockQuantity: 100,
-      lowStockAlert: 30,
-      unit: 'boxes',
-      category: 'General',
-    },
-    {
-      name: 'Thermometer',
-      sku: 'GEN004',
-      price: 150.00,
-      gstPercent: 18,
-      stockQuantity: 20,
-      lowStockAlert: 5,
-      unit: 'pieces',
-      category: 'Equipment',
-    },
-    {
-      name: 'BP Monitor',
-      sku: 'GEN005',
-      price: 1200.00,
-      gstPercent: 18,
-      stockQuantity: 8,
-      lowStockAlert: 3,
-      unit: 'pieces',
-      category: 'Equipment',
-    },
+      categoryId: categoryGeneral.id,
+    }
   ];
 
+  // @ts-ignore
   for (const productData of products) {
     await prisma.product.create({
       data: {
         businessId: business.id,
+        // @ts-ignore
         ...productData,
       },
     });
   }
 
-  console.log('Created 10 sample products');
+  console.log('Created sample products');
 
   // Create sample customers
   const customers = [
@@ -176,13 +138,7 @@ async function main() {
       phone: '+919876543212',
       email: 'amit.patel@email.com',
       address: '22 Indiranagar, Bangalore',
-    },
-    {
-      name: 'Dr. Sunita Reddy',
-      phone: '+919876543213',
-      email: 'sunita.reddy@hospital.com',
-      address: 'MG Hospital, Bangalore',
-    },
+    }
   ];
 
   for (const customerData of customers) {
@@ -194,8 +150,7 @@ async function main() {
     });
   }
 
-  console.log('Created 3 sample customers');
-
+  console.log('Created sample customers');
   console.log('Seed completed successfully!');
 }
 
