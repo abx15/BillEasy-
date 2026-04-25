@@ -1,4 +1,5 @@
 import { apiClient, handleApiResponse, handleApiError } from '../api'
+import { AxiosError } from 'axios'
 import { User } from '@/store/authStore'
 
 // Types
@@ -39,7 +40,7 @@ export const authApi = {
       const response = await apiClient.post('/auth/login', data)
       return handleApiResponse<AuthResponse>(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -49,7 +50,7 @@ export const authApi = {
       const response = await apiClient.post('/auth/register', data)
       return handleApiResponse<AuthResponse>(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -59,7 +60,7 @@ export const authApi = {
       await apiClient.post('/auth/logout')
     } catch (error) {
       // Don't throw error for logout, just log it
-      console.error('Logout error:', handleApiError(error))
+      console.error('Logout error:', handleApiError(error as AxiosError))
     }
   },
 
@@ -69,7 +70,7 @@ export const authApi = {
       const response = await apiClient.post('/auth/refresh', { refreshToken })
       return handleApiResponse<RefreshTokenResponse>(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -79,7 +80,7 @@ export const authApi = {
       const response = await apiClient.get('/auth/me')
       return handleApiResponse<User>(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 }
