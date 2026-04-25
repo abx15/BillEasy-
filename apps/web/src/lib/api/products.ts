@@ -1,4 +1,5 @@
 import { apiClient, handleApiResponse, handleApiError } from '../api'
+import { AxiosError } from 'axios'
 
 // Types
 export interface Product {
@@ -75,7 +76,7 @@ export const productsApi = {
       const response = await apiClient.get(`/products?${searchParams.toString()}`)
       return handleApiResponse(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -85,7 +86,7 @@ export const productsApi = {
       const response = await apiClient.get(`/products/${id}`)
       return handleApiResponse<Product>(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -97,7 +98,7 @@ export const productsApi = {
       const response = await apiClient.get(`/products/search?q=${encodeURIComponent(query)}`)
       return handleApiResponse<Product[]>(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -107,7 +108,7 @@ export const productsApi = {
       const response = await apiClient.get('/products/low-stock')
       return handleApiResponse<Product[]>(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -117,7 +118,7 @@ export const productsApi = {
       const response = await apiClient.post('/products', data)
       return handleApiResponse<Product>(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -127,7 +128,7 @@ export const productsApi = {
       const response = await apiClient.put(`/products/${id}`, data)
       return handleApiResponse<Product>(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -136,7 +137,7 @@ export const productsApi = {
     try {
       await apiClient.delete(`/products/${id}`)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -146,7 +147,7 @@ export const productsApi = {
       const response = await apiClient.put(`/products/${id}/stock`, data)
       return handleApiResponse<Product>(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -156,7 +157,7 @@ export const productsApi = {
       const response = await apiClient.get('/products/categories')
       return handleApiResponse<string[]>(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -184,7 +185,7 @@ export const productsApi = {
       const response = await apiClient.get(`/products/stats?${searchParams.toString()}`)
       return handleApiResponse(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -220,7 +221,7 @@ export const productsApi = {
       const response = await apiClient.get(`/products/${id}/sales?${searchParams.toString()}`)
       return handleApiResponse(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -230,7 +231,7 @@ export const productsApi = {
       const response = await apiClient.post('/products/generate-sku', { name, category })
       return handleApiResponse<string>(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 }
