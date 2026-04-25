@@ -1,0 +1,277 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches: [main, develop]
+
+env:
+  NODE_VERSION: '20'
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  lint:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js (API)
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: apps/api
+
+      - name: Lint API
+        working-directory: apps/api
+        run: |
+          npm ci
+          npm run lint
+          npx tsc --noEmit
+
+      - name: Setup Node.js (Web)
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: apps/web
+
+      - name: Lint Web
+        working-directory: apps/web
+        run: |
+          npm ci
+          npm run lint
+          npx tsc --noEmit
+
+      - name: Setup Python (ML)
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: apps/ml-api
+
+      - name: Lint ML
+        working-directory: apps/ml-api
+        run: |
+          python -m pip install --upgrade pip
+          pip install black flake8 mypy
+          black --check .
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          mypy app/ --ignore-missing-imports || true
+
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Audit API dependencies
+        working-directory: apps/api
+        run: |
+          npm ci
+          npm audit --audit-level=high
+
+      - name: Audit Web dependencies
+        working-directory: apps/web
+        run: |
+          npm ci
+          npm audit --audit-level=high
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Audit Python dependencies
+        working-directory: apps/ml-api
+        run: |
+          python -m pip install --upgrade pip
+          pip install safety
+          safety check --json --output safety-report.json || true
+
+      - name: Upload safety report
+        uses: actions/upload-artifact@v4
+        with:
+          name: safety-report
+          path: apps/ml-api/safety-report.json
+
+  build-test:
+    name: Build Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install all dependencies
+        run: npm ci
+
+      - name: Build all packages
+        run: npm run build
+
+      - name: Test build artifacts
+        run: |
+          # Check if build outputs exist
+          test -d apps/api/dist || (echo "API build failed" && exit 1)
+          test -d apps/web/.next || (echo "Web build failed" && exit 1)
+
+  size-check:
+    name: Bundle Size Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: apps/web
+
+      - name: Install dependencies
+        working-directory: apps/web
+        run: npm ci
+
+      - name: Build and analyze
+        working-directory: apps/web
+        run: |
+          npm run build
+          npx @next/bundle-analyzer .next
+
+      - name: Check bundle sizes
+        run: |
+          # Set size limits (in bytes)
+          MAX_JS_SIZE=1048576  # 1MB
+          MAX_CSS_SIZE=262144  # 256KB
+          
+          # Find and check JS files
+          JS_SIZE=$(find apps/web/.next/static/chunks -name "*.js" -exec du -b {} + | awk '{sum+=$1} END {print sum}')
+          if [ "$JS_SIZE" -gt "$MAX_JS_SIZE" ]; then
+            echo "JS bundle size $JS_SIZE exceeds limit $MAX_JS_SIZE"
+            exit 1
+          fi
+          
+          # Find and check CSS files
+          CSS_SIZE=$(find apps/web/.next/static/css -name "*.css" -exec du -b {} + | awk '{sum+=$1} END {print sum}')
+          if [ "$CSS_SIZE" -gt "$MAX_CSS_SIZE" ]; then
+            echo "CSS bundle size $CSS_SIZE exceeds limit $MAX_CSS_SIZE"
+            exit 1
+          fi
+          
+          echo "✅ Bundle sizes within limits"
+
+  dependency-check:
+    name: Dependency Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for outdated dependencies
+        run: |
+          # Check API dependencies
+          cd apps/api
+          npm outdated || true
+          
+          # Check Web dependencies
+          cd ../web
+          npm outdated || true
+          
+          # Check ML dependencies
+          cd ../ml-api
+          pip list --outdated || true
+
+      - name: Check for duplicate dependencies
+        run: |
+          # Find duplicate dependencies across packages
+          echo "Checking for duplicate dependencies..."
+          find . -name "package.json" -not -path "./node_modules/*" -exec cat {} \; | \
+          jq -r '.dependencies + .devDependencies | keys[]' | \
+          sort | uniq -d > duplicates.txt
+          
+          if [ -s duplicates.txt ]; then
+            echo "⚠️ Duplicate dependencies found:"
+            cat duplicates.txt
+          else
+            echo "✅ No duplicate dependencies found"
+          fi
+
+  notify:
+    name: Notify PR Status
+    runs-on: ubuntu-latest
+    needs: [lint, security, build-test, size-check, dependency-check]
+    if: always()
+    steps:
+      - name: PR Status Comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const prNumber = context.issue.number;
+            
+            const status = {
+              lint: '${{ needs.lint.result }}',
+              security: '${{ needs.security.result }}',
+              build: '${{ needs.build-test.result }}',
+              size: '${{ needs.size-check.result }}',
+              deps: '${{ needs.dependency-check.result }}'
+            };
+            
+            let comment = '## 🧪 PR Status Check Results\n\n';
+            
+            comment += '| Check | Status |\n';
+            comment += '|-------|--------|\n';
+            comment += `| 📝 Lint | ${status.lint === 'success' ? '✅ Passed' : '❌ Failed'} |\n`;
+            comment += `| 🔒 Security | ${status.security === 'success' ? '✅ Passed' : '❌ Failed'} |\n`;
+            comment += `| 🏗️ Build | ${status.build === 'success' ? '✅ Passed' : '❌ Failed'} |\n`;
+            comment += `| 📦 Bundle Size | ${status.size === 'success' ? '✅ Passed' : '❌ Failed'} |\n`;
+            comment += `| 📋 Dependencies | ${status.deps === 'success' ? '✅ Passed' : '❌ Failed'} |\n\n`;
+            
+            const allPassed = Object.values(status).every(result => result === 'success');
+            
+            if (allPassed) {
+              comment += '🎉 All checks passed! This PR is ready for review.\n';
+            } else {
+              comment += '⚠️ Some checks failed. Please review and fix the issues.\n';
+            }
+            
+            // Find existing comment
+            const comments = await github.rest.issues.listComments({
+              owner,
+              repo,
+              issue_number: prNumber,
+            });
+            
+            const existingComment = comments.data.find(comment => 
+              comment.body.includes('PR Status Check Results') && 
+              comment.user.type === 'Bot'
+            );
+            
+            if (existingComment) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existingComment.id,
+                body: comment,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: prNumber,
+                body: comment,
+              });
+            }
