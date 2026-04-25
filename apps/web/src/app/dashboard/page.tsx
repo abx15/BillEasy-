@@ -9,277 +9,322 @@ import {
   AlertTriangle,
   Plus,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  DollarSign,
+  ShoppingCart,
+  Activity
 } from 'lucide-react'
+// import { motion } from 'framer-motion'
+import { 
+  AreaChart, 
+  Area, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer 
+} from 'recharts'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Skeleton } from '@/components/ui/Skeleton'
-import { billingApi } from '@/lib/api/billing'
-import { productsApi } from '@/lib/api/products'
-import { customersApi } from '@/lib/api/customers'
-import { formatCurrency, formatDate } from '@/lib/utils/date'
+import Link from 'next/link'
 
-interface StatCard {
-  title: string
-  value: string
-  change: number
-  changeType: 'increase' | 'decrease'
-  icon: React.ComponentType<{ className?: string }>
-  color: 'primary' | 'success' | 'warning' | 'destructive'
-}
+const data = [
+  { name: 'Jan', revenue: 4000, bills: 240 },
+  { name: 'Feb', revenue: 3000, bills: 198 },
+  { name: 'Mar', revenue: 5000, bills: 300 },
+  { name: 'Apr', revenue: 2780, bills: 208 },
+  { name: 'May', revenue: 1890, bills: 150 },
+  { name: 'Jun', revenue: 6390, bills: 430 },
+]
 
 export default function DashboardPage() {
-  const [stats, setStats] = useState<any>(null)
-  const [lowStockProducts, setLowStockProducts] = useState<any[]>([])
-  const [recentBills, setRecentBills] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const [billStats, lowStock, bills] = await Promise.all([
-          billingApi.getBillStats(),
-          productsApi.getLowStockProducts(),
-          billingApi.getBills({ limit: 5 })
-        ])
-
-        setStats(billStats)
-        setLowStockProducts(lowStock)
-        setRecentBills(bills.items)
-      } catch (error) {
-        console.error('Failed to fetch dashboard data:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchDashboardData()
+    const timer = setTimeout(() => setLoading(false), 800)
+    return () => clearTimeout(timer)
   }, [])
-
-  const statCards: StatCard[] = stats ? [
-    {
-      title: 'Total Revenue',
-      value: formatCurrency(stats.totalRevenue),
-      change: 12.5,
-      changeType: 'increase',
-      icon: TrendingUp,
-      color: 'success'
-    },
-    {
-      title: 'Total Bills',
-      value: stats.totalBills.toString(),
-      change: 8.2,
-      changeType: 'increase',
-      icon: FileText,
-      color: 'primary'
-    },
-    {
-      title: 'Total Customers',
-      value: '248',
-      change: 15.3,
-      changeType: 'increase',
-      icon: Users,
-      color: 'primary'
-    },
-    {
-      title: 'Low Stock Items',
-      value: lowStockProducts.length.toString(),
-      change: -5.2,
-      changeType: 'decrease',
-      icon: AlertTriangle,
-      color: 'warning'
-    }
-  ] : []
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-8 animate-pulse">
+        <div className="flex justify-between items-center">
+          <div className="space-y-2">
+            <div className="h-8 w-48 bg-slate-200 rounded" />
+            <div className="h-4 w-64 bg-slate-100 rounded" />
+          </div>
+          <div className="h-10 w-32 bg-slate-200 rounded" />
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <StatsCardSkeleton key={i} />
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-32 bg-slate-100 rounded-card" />
           ))}
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <Skeleton className="h-96" />
-          </div>
-          <div>
-            <Skeleton className="h-96" />
-          </div>
+          <div className="lg:col-span-2 h-[400px] bg-slate-100 rounded-card" />
+          <div className="h-[400px] bg-slate-100 rounded-card" />
         </div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-          <p className="text-muted-foreground">
-            Welcome back! Here's what's happening with your business today.
-          </p>
-        </div>
-        <Button>
-          <Plus className="w-4 h-4 mr-2" />
-          New Bill
-        </Button>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {statCards.map((stat, index) => (
-          <Card key={index}>
-            <div className="card-content">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">{stat.title}</p>
-                  <p className="text-2xl font-bold text-foreground">{stat.value}</p>
-                </div>
-                <div className={`p-3 rounded-lg bg-${stat.color}/10`}>
-                  <stat.icon className={`w-6 h-6 text-${stat.color}`} />
-                </div>
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
+                <span className="text-white font-bold text-lg">B</span>
               </div>
-              <div className="flex items-center mt-4">
-                {stat.changeType === 'increase' ? (
-                  <ArrowUpRight className="w-4 h-4 text-success mr-1" />
-                ) : (
-                  <ArrowDownRight className="w-4 h-4 text-destructive mr-1" />
-                )}
-                <span className={`text-sm ${
-                  stat.changeType === 'increase' ? 'text-success' : 'text-destructive'
-                }`}>
-                  {Math.abs(stat.change)}% from last month
-                </span>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Executive Dashboard</h1>
+                <p className="text-gray-600 text-sm mt-1">
+                  Welcome back! Today is {new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                </p>
               </div>
             </div>
-          </Card>
-        ))}
+            <div className="flex items-center gap-2 text-sm">
+              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+              <span className="text-gray-600">All systems operational</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button variant="secondary" className="hidden sm:flex bg-gray-100 hover:bg-gray-200 text-gray-700">
+              <Activity className="w-4 h-4 mr-2" /> Activity Log
+            </Button>
+            <Button variant="outline" className="hidden sm:flex border-gray-200 text-gray-700 hover:bg-gray-50">
+              <ArrowDownRight className="w-4 h-4 mr-2" /> Export Report
+            </Button>
+            <Link href="/dashboard/bills/new">
+              <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all">
+                <Plus className="w-4 h-4 mr-2" /> Create Bill
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatCard 
+          title="Total Revenue" 
+          value="₹1,28,450" 
+          change="+12.5%" 
+          isIncrease={true}
+          icon={DollarSign}
+          color="bg-emerald-500"
+        />
+        <StatCard 
+          title="Total Invoices" 
+          value="156" 
+          change="+8.2%" 
+          isIncrease={true}
+          icon={FileText}
+          color="bg-blue-500"
+        />
+        <StatCard 
+          title="New Customers" 
+          value="24" 
+          change="-3.1%" 
+          isIncrease={false}
+          icon={Users}
+          color="bg-purple-500"
+        />
+        <StatCard 
+          title="Avg. Bill Value" 
+          value="₹823.40" 
+          change="+5.4%" 
+          isIncrease={true}
+          icon={ShoppingCart}
+          color="bg-orange-500"
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Revenue Chart */}
-        <div className="lg:col-span-2">
-          <Card>
-            <div className="card-header">
-              <h3 className="text-lg font-semibold text-foreground">Revenue Overview</h3>
-              <p className="text-sm text-muted-foreground">
-                Monthly revenue for the last 6 months
-              </p>
+        {/* Main Chart */}
+        <Card className="lg:col-span-2 shadow-premium border-none overflow-hidden bg-white">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h3 className="text-lg font-bold text-foreground">Revenue Dynamics</h3>
+              <p className="text-sm text-muted-foreground">Historical performance over 6 months</p>
             </div>
-            <div className="card-content">
-              <div className="h-80 flex items-center justify-center text-muted-foreground">
-                <div className="text-center">
-                  <TrendingUp className="w-12 h-12 mx-auto mb-2" />
-                  <p>Chart will be implemented with Recharts</p>
-                </div>
-              </div>
+            <select className="bg-surface-100 border-none rounded-button px-3 py-1.5 text-sm font-medium focus:ring-0">
+              <option>Last 6 Months</option>
+              <option>Last Year</option>
+            </select>
+          </div>
+          <div className="h-[320px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={data}>
+                <defs>
+                  <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#4f66ff" stopOpacity={0.15}/>
+                    <stop offset="95%" stopColor="#4f66ff" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis 
+                  dataKey="name" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: '#94a3b8', fontSize: 12 }}
+                  dy={10}
+                />
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: '#94a3b8', fontSize: 12 }}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    borderRadius: '12px', 
+                    border: 'none', 
+                    boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)',
+                    padding: '12px'
+                  }} 
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="revenue" 
+                  stroke="#4f66ff" 
+                  strokeWidth={3}
+                  fillOpacity={1} 
+                  fill="url(#colorRevenue)" 
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+
+        {/* Right Sidebar Components */}
+        <div className="space-y-6">
+          {/* Low Stock Card */}
+          <Card className="border-none shadow-soft overflow-hidden">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold">Inventory Alerts</h3>
+              <Badge status="destructive">Critical</Badge>
+            </div>
+            <div className="space-y-4">
+              <InventoryItem name="Organic Turmeric" stock={12} min={20} />
+              <InventoryItem name="Refined Sugar (1kg)" stock={4} min={15} />
+              <InventoryItem name="Sunflower Oil (5L)" stock={2} min={10} />
+              <Button variant="outline" fullWidth className="mt-2 text-xs">Manage Inventory</Button>
             </div>
           </Card>
-        </div>
 
-        {/* Low Stock Alert */}
-        <div>
-          <Card>
-            <div className="card-header">
-              <h3 className="text-lg font-semibold text-foreground">Low Stock Alert</h3>
-              <Badge status="LOW" size="sm">
-                {lowStockProducts.length} items
-              </Badge>
+          {/* Quick Stats */}
+          <Card className="bg-brand-gradient border-none text-white shadow-premium relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-20">
+              <TrendingUp className="w-24 h-24 rotate-12" />
             </div>
-            <div className="card-content">
-              {lowStockProducts.length > 0 ? (
-                <div className="space-y-3">
-                  {lowStockProducts.slice(0, 3).map((product) => (
-                    <div key={product.id} className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium text-foreground">{product.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          Stock: {product.stock}
-                        </p>
-                      </div>
-                      <Badge status="LOW" size="sm">
-                        Low
-                      </Badge>
-                    </div>
-                  ))}
-                  {lowStockProducts.length > 3 && (
-                    <Button variant="outline" size="sm" className="w-full">
-                      View All ({lowStockProducts.length - 3} more)
-                    </Button>
-                  )}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <Package className="w-12 h-12 mx-auto mb-2 text-success" />
-                  <p className="text-muted-foreground">All products are in stock</p>
-                </div>
-              )}
+            <div className="relative z-10">
+              <h4 className="text-white/80 font-medium mb-1">Weekly Target</h4>
+              <p className="text-3xl font-bold mb-4">78% Achieved</p>
+              <div className="w-full bg-white/20 h-2 rounded-full overflow-hidden">
+                <div className="bg-white h-full w-[78%] transition-all duration-1000" />
+              </div>
+              <p className="text-xs text-white/60 mt-3 italic">₹22,450 left to hit goal</p>
             </div>
           </Card>
         </div>
       </div>
 
-      {/* Recent Bills */}
-      <Card>
-        <div className="card-header">
-          <h3 className="text-lg font-semibold text-foreground">Recent Bills</h3>
-          <Button variant="outline" size="sm">
-            View All
-          </Button>
-        </div>
-        <div className="card-content">
-          {recentBills.length > 0 ? (
-            <div className="space-y-4">
-              {recentBills.map((bill) => (
-                <div key={bill.id} className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-foreground">{bill.invoiceNumber}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {bill.customerName} • {formatDate(bill.createdAt)}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-foreground">
-                      {formatCurrency(bill.totalAmount)}
-                    </p>
-                    <Badge status={bill.status as any} size="sm">
-                      {bill.status}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <FileText className="w-12 h-12 mx-auto mb-2 text-muted-foreground" />
-              <p className="text-muted-foreground">No bills created yet</p>
-            </div>
-          )}
-        </div>
-      </Card>
+      {/* Recent Bills Table Section */}
+      <div className="grid grid-cols-1 gap-6">
+        <Card className="border-none shadow-soft p-0">
+          <div className="flex items-center justify-between p-6 border-b border-border/50">
+            <h3 className="font-bold text-lg">Transaction History</h3>
+            <Button variant="ghost" size="sm">View Detailed Report</Button>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-surface-100 text-muted-foreground text-xs font-bold uppercase tracking-wider">
+                  <th className="px-6 py-4">Inovice ID</th>
+                  <th className="px-6 py-4">Client</th>
+                  <th className="px-6 py-4">Date</th>
+                  <th className="px-6 py-4">Amount</th>
+                  <th className="px-6 py-4">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/50">
+                <BillRow id="INV-8821" customer="Arun Kumar" date="20 Apr, 12:45" amount="₹2,450.00" status="PAID" />
+                <BillRow id="INV-8820" customer="Rahul Sharma" date="19 Apr, 15:20" amount="₹450.00" status="PENDING" />
+                <BillRow id="INV-8819" customer="Sita Gupta" date="19 Apr, 10:15" amount="₹12,200.00" status="PAID" />
+                <BillRow id="INV-8818" customer="Priya Singh" date="18 Apr, 16:30" amount="₹1,800.00" status="CANCELLED" />
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      </div>
     </div>
   )
 }
 
-// Skeleton component for stats cards
-function StatsCardSkeleton() {
+function StatCard({ title, value, change, isIncrease, icon: Icon, color }: any) {
   return (
-    <Card>
-      <div className="card-content">
-        <div className="flex items-center justify-between">
-          <div className="space-y-2">
-            <Skeleton variant="text" width="80px" height="16px" />
-            <Skeleton variant="text" width="120px" height="24px" />
+    <Card className="group hover:-translate-y-1 transition-all duration-300 border-none shadow-lg bg-white overflow-hidden">
+      <div className="flex items-start justify-between">
+        <div className="flex-1">
+          <p className="text-gray-600 text-sm font-medium mb-2 uppercase tracking-wider">{title}</p>
+          <h3 className="text-3xl font-bold text-gray-900 mb-3">{value}</h3>
+          <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-bold ${isIncrease ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
+            {isIncrease ? <ArrowUpRight className="w-4 h-4 mr-1" /> : <ArrowDownRight className="w-4 h-4 mr-1" />}
+            {change}
+            <span className="ml-1 text-xs">vs last month</span>
           </div>
-          <Skeleton variant="circular" width="48px" height="48px" />
         </div>
-        <div className="mt-4">
-          <Skeleton variant="text" width="100px" height="14px" />
+        <div className={`p-4 rounded-2xl ${color} text-white shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+          <Icon className="w-7 h-7" />
         </div>
       </div>
+      {/* Bottom decoration */}
+      <div className={`h-1 mt-4 bg-gradient-to-r ${isIncrease ? 'from-emerald-500 to-emerald-400' : 'from-rose-500 to-rose-400'}`} />
     </Card>
+  )
+}
+
+function InventoryItem({ name, stock, min }: any) {
+  const percent = (stock / min) * 100
+  return (
+    <div className="space-y-2">
+      <div className="flex justify-between text-sm">
+        <span className="font-medium text-foreground">{name}</span>
+        <span className="text-muted-foreground font-bold">{stock} / {min} left</span>
+      </div>
+      <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+        <div 
+          className={`h-full transition-all duration-1000 ${percent < 25 ? 'bg-rose-500' : 'bg-orange-500'}`} 
+          style={{ width: `${percent}%` }} 
+        />
+      </div>
+    </div>
+  )
+}
+
+function BillRow({ id, customer, date, amount, status }: any) {
+  const statusColors: any = {
+    PAID: 'bg-emerald-100 text-emerald-700',
+    PENDING: 'bg-orange-100 text-orange-700',
+    CANCELLED: 'bg-slate-100 text-slate-700'
+  }
+  return (
+    <tr className="hover:bg-surface-100 transition-colors cursor-pointer group">
+      <td className="px-6 py-4">
+        <span className="font-bold text-primary-600 group-hover:underline">{id}</span>
+      </td>
+      <td className="px-6 py-4 font-semibold text-foreground">{customer}</td>
+      <td className="px-6 py-4 text-muted-foreground text-sm">{date}</td>
+      <td className="px-6 py-4 font-bold text-foreground">{amount}</td>
+      <td className="px-6 py-4">
+        <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold tracking-wider ${statusColors[status]}`}>
+          {status}
+        </span>
+      </td>
+    </tr>
   )
 }
