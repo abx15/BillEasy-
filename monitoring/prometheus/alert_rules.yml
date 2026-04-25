@@ -1,0 +1,230 @@
+groups:
+  - name: billeasy_alerts
+    rules:
+      # Application Health Alerts
+      - alert: ApplicationDown
+        expr: up{job=~"billeasy-.*"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "BillEasy application is down"
+          description: "{{ $labels.job }} has been down for more than 1 minute."
+
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value }} errors per second."
+
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High response time detected"
+          description: "95th percentile response time is {{ $value }} seconds."
+
+      # Database Alerts
+      - alert: DatabaseDown
+        expr: up{job="postgres"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PostgreSQL database is down"
+          description: "PostgreSQL has been down for more than 1 minute."
+
+      - alert: DatabaseConnectionsHigh
+        expr: pg_stat_activity_count > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High database connections"
+          description: "Database has {{ $value }} active connections."
+
+      - alert: DatabaseSlowQueries
+        expr: rate(pg_stat_statements_mean_time_seconds[5m]) > 0.5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow database queries detected"
+          description: "Average query time is {{ $value }} seconds."
+
+      # Redis Alerts
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Redis is down"
+          description: "Redis has been down for more than 1 minute."
+
+      - alert: RedisMemoryHigh
+        expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Redis memory usage high"
+          description: "Redis memory usage is {{ $value | humanizePercentage }}."
+
+      # Container Resource Alerts
+      - alert: ContainerCPUHigh
+        expr: rate(container_cpu_usage_seconds_total{name=~"billeasy-.*"}[5m]) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage in container"
+          description: "Container {{ $labels.name }} CPU usage is {{ $value | humanizePercentage }}."
+
+      - alert: ContainerMemoryHigh
+        expr: container_memory_usage_bytes{name=~"billeasy-.*"} / container_spec_memory_limit_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage in container"
+          description: "Container {{ $labels.name }} memory usage is {{ $value | humanizePercentage }}."
+
+      - alert: ContainerDiskHigh
+        expr: container_fs_usage_bytes{name=~"billeasy-.*"} / container_fs_limit_bytes > 0.85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High disk usage in container"
+          description: "Container {{ $labels.name }} disk usage is {{ $value | humanizePercentage }}."
+
+      # System Resource Alerts
+      - alert: NodeCPUHigh
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage on node"
+          description: "Node {{ $labels.instance }} CPU usage is {{ $value }}%."
+
+      - alert: NodeMemoryHigh
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage on node"
+          description: "Node {{ $labels.instance }} memory usage is {{ $value }}%."
+
+      - alert: NodeDiskHigh
+        expr: (1 - (node_filesystem_avail_bytes / node_filesystem_size_bytes)) * 100 > 90
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High disk usage on node"
+          description: "Node {{ $labels.instance }} disk usage is {{ $value }}%."
+
+      - alert: NodeDiskSpaceLow
+        expr: node_filesystem_avail_bytes / node_filesystem_size_bytes < 0.1
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Low disk space on node"
+          description: "Node {{ $labels.instance }} has less than 10% disk space available."
+
+      # Network Alerts
+      - alert: HighNetworkTraffic
+        expr: rate(node_network_receive_bytes_total[5m]) + rate(node_network_transmit_bytes_total[5m]) > 100000000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High network traffic"
+          description: "Node {{ $labels.instance }} network traffic is {{ $value | humanizeBytes }}/s."
+
+      # SSL Certificate Alerts
+      - alert: SSLCertificateExpiringSoon
+        expr: probe_ssl_earliest_cert_expiry - time() < 86400 * 7
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "SSL certificate expiring soon"
+          description: "SSL certificate for {{ $labels.instance }} expires in {{ $value }} days."
+
+      - alert: SSLCertificateExpired
+        expr: probe_ssl_earliest_cert_expiry - time() < 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "SSL certificate expired"
+          description: "SSL certificate for {{ $labels.instance }} has expired."
+
+      # Business Logic Alerts
+      - alert: LowUserActivity
+        expr: rate(http_requests_total{handler=~"/api/.*"}[1h]) < 0.01
+        for: 2h
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low user activity detected"
+          description: "API requests rate is {{ $value }} requests per second."
+
+      - alert: HighFailedLogins
+        expr: rate(http_requests_total{handler="/api/auth/login",status="401"}[5m]) > 5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High failed login attempts"
+          description: "Failed login rate is {{ $value }} attempts per second."
+
+      - alert: NoBackupsRecently
+        expr: time() - backup_last_success_timestamp > 86400 * 2
+        for: 1h
+        labels:
+          severity: critical
+        annotations:
+          summary: "No recent backups"
+          description: "Last successful backup was {{ $value }} days ago."
+
+  - name: infrastructure_alerts
+    rules:
+      # Docker Container Alerts
+      - alert: ContainerRestarting
+        expr: increase(container_start_time_seconds[1h]) > 3
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container restarting frequently"
+          description: "Container {{ $labels.name }} has restarted {{ $value }} times in the last hour."
+
+      - alert: ContainerNotRunning
+        expr: container_state_running == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Container not running"
+          description: "Container {{ $labels.name }} is not running."
+
+      # Service Discovery Alerts
+      - alert: ServiceDiscoveryFailed
+        expr: up{job=~"billeasy-.*"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service discovery failed"
+          description: "Service {{ $labels.job }} is not discoverable."
