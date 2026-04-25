@@ -1,4 +1,5 @@
 import { apiClient, handleApiResponse, handleApiError } from '../api'
+import { AxiosError } from 'axios'
 import { BillData } from '@/store/billingStore'
 
 // Types
@@ -62,7 +63,7 @@ export const billingApi = {
       const response = await apiClient.post('/bills', data)
       return handleApiResponse<Bill>(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -87,7 +88,7 @@ export const billingApi = {
       const response = await apiClient.get(`/bills?${searchParams.toString()}`)
       return handleApiResponse(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -97,7 +98,7 @@ export const billingApi = {
       const response = await apiClient.get(`/bills/${id}`)
       return handleApiResponse<Bill>(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -107,7 +108,7 @@ export const billingApi = {
       const response = await apiClient.put(`/bills/${id}/payment`, data)
       return handleApiResponse<Bill>(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -116,7 +117,7 @@ export const billingApi = {
     try {
       await apiClient.post(`/bills/${id}/send`)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -131,7 +132,7 @@ export const billingApi = {
       const blob = new Blob([response.data], { type: 'application/pdf' })
       return URL.createObjectURL(blob)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -140,7 +141,7 @@ export const billingApi = {
     try {
       await apiClient.delete(`/bills/${id}`)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -164,7 +165,7 @@ export const billingApi = {
       const response = await apiClient.get(`/bills/stats?${searchParams.toString()}`)
       return handleApiResponse(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 }
