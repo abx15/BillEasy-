@@ -1,364 +1,263 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Download, Calendar, TrendingUp, FileText, Users, Package } from 'lucide-react'
+import { useState } from 'react'
+import { 
+  BarChart3, 
+  TrendingUp, 
+  PieChart as PieChartIcon, 
+  Calendar, 
+  Download, 
+  Filter, 
+  ChevronDown,
+  ArrowUpRight,
+  ArrowDownRight,
+  DollarSign,
+  Package,
+  Users
+} from 'lucide-react'
+import { motion } from 'framer-motion'
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  LineChart,
+  Line,
+  AreaChart,
+  Area
+} from 'recharts'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { Badge } from '@/components/ui/Badge'
-import { reportsApi } from '@/lib/api/reports'
-import { formatCurrency, formatDate } from '@/lib/utils/date'
+
+const revenueData = [
+  { name: 'Week 1', revenue: 45000, expenses: 32000 },
+  { name: 'Week 2', revenue: 52000, expenses: 38000 },
+  { name: 'Week 3', revenue: 48000, expenses: 31000 },
+  { name: 'Week 4', revenue: 61000, expenses: 42000 },
+]
+
+const categoryData = [
+  { name: 'Spices', value: 400, color: '#4f66ff' },
+  { name: 'Grains', value: 300, color: '#10b981' },
+  { name: 'Essentials', value: 300, color: '#f59e0b' },
+  { name: 'Others', value: 200, color: '#6366f1' },
+]
 
 export default function ReportsPage() {
-  const [selectedPeriod, setSelectedPeriod] = useState('month')
-  const [selectedReport, setSelectedReport] = useState('revenue')
-  const [reportData, setReportData] = useState<any>(null)
-  const [loading, setLoading] = useState(false)
-
-  useEffect(() => {
-    fetchReport()
-  }, [selectedPeriod, selectedReport])
-
-  const fetchReport = async () => {
-    setLoading(true)
-    try {
-      let data
-      switch (selectedReport) {
-        case 'revenue':
-          data = await reportsApi.getRevenueReport(
-            new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1).toISOString().split('T')[0],
-            new Date().toISOString().split('T')[0]
-          )
-          break
-        case 'daily':
-          data = await reportsApi.getDailyReport()
-          break
-        case 'monthly':
-          data = await reportsApi.getMonthlyReport()
-          break
-        default:
-          data = null
-      }
-      setReportData(data)
-    } catch (error) {
-      console.error('Failed to fetch report:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const exportReport = async () => {
-    try {
-      let url
-      switch (selectedReport) {
-        case 'gst':
-          url = await reportsApi.exportGSTReport(
-            new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1).toISOString().split('T')[0],
-            new Date().toISOString().split('T')[0]
-          )
-          break
-        default:
-          return
-      }
-      
-      if (url) {
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `report-${selectedPeriod}-${new Date().toISOString().split('T')[0]}.csv`
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
-      }
-    } catch (error) {
-      console.error('Failed to export report:', error)
-    }
-  }
+  const [timeframe, setTimeframe] = useState('This Month')
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-8"
+    >
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Reports</h1>
-          <p className="text-muted-foreground">
-            Business analytics and financial insights
-          </p>
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">Financial Intelligence</h1>
+          <p className="text-muted-foreground mt-1">Deep dive into your business metrics and performance analytics.</p>
         </div>
-        <Button onClick={exportReport}>
-          <Download className="w-4 h-4 mr-2" />
-          Export Report
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button variant="outline" className="hidden sm:flex">
+            <Filter className="w-4 h-4 mr-2" /> Custom Range
+          </Button>
+          <Button className="shadow-brand">
+            <Download className="w-4 h-4 mr-2" /> Generate PDF Report
+          </Button>
+        </div>
       </div>
 
-      {/* Filters */}
-      <Card>
-        <div className="card-content">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <label className="text-sm font-medium text-foreground mb-2 block">
-                Report Period
-              </label>
-              <select
-                value={selectedPeriod}
-                onChange={(e) => setSelectedPeriod(e.target.value)}
-                className="w-full px-3 py-2 border border-border bg-background rounded-lg text-sm"
-              >
-                <option value="today">Today</option>
-                <option value="week">This Week</option>
-                <option value="month">This Month</option>
-                <option value="quarter">This Quarter</option>
-                <option value="year">This Year</option>
-                <option value="custom">Custom Range</option>
-              </select>
-            </div>
+      {/* High-Level Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <ReportMetric 
+          label="Net Profit" 
+          value="₹42,850" 
+          change="+18.4%" 
+          isIncrease={true} 
+          icon={DollarSign}
+        />
+        <ReportMetric 
+          label="Total Expenses" 
+          value="₹1,12,000" 
+          change="+2.1%" 
+          isIncrease={false} 
+          icon={TrendingUp}
+        />
+        <ReportMetric 
+          label="Inventory Turnover" 
+          value="4.2x" 
+          change="+0.5x" 
+          isIncrease={true} 
+          icon={Package}
+        />
+        <ReportMetric 
+          label="New Leads" 
+          value="156" 
+          change="+22%" 
+          isIncrease={true} 
+          icon={Users}
+        />
+      </div>
 
-            <div className="flex-1">
-              <label className="text-sm font-medium text-foreground mb-2 block">
-                Report Type
-              </label>
-              <select
-                value={selectedReport}
-                onChange={(e) => setSelectedReport(e.target.value)}
-                className="w-full px-3 py-2 border border-border bg-background rounded-lg text-sm"
-              >
-                <option value="revenue">Revenue Report</option>
-                <option value="daily">Daily Summary</option>
-                <option value="monthly">Monthly Summary</option>
-                <option value="gst">GST Report</option>
-                <option value="customers">Customer Analytics</option>
-                <option value="products">Product Analytics</option>
-              </select>
+      {/* Primary Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Revenue vs Expenses */}
+        <Card className="lg:col-span-2 border-none shadow-premium bg-white p-6">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h3 className="text-lg font-bold">Revenue vs Expenses</h3>
+              <p className="text-sm text-muted-foreground">Weekly comparison for current month</p>
+            </div>
+            <div className="flex items-center gap-4 text-xs font-bold">
+              <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-primary-500" /> Revenue</div>
+              <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-slate-300" /> Expenses</div>
             </div>
           </div>
-        </div>
-      </Card>
-
-      {/* Report Content */}
-      {loading ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <div className="card-content">
-              <div className="h-96 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              </div>
-            </div>
-          </Card>
-        </div>
-      ) : reportData ? (
-        <div className="space-y-6">
-          {/* Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Card>
-              <div className="card-content">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Total Revenue</p>
-                    <p className="text-2xl font-bold text-foreground">
-                      {formatCurrency(reportData.totalRevenue || 0)}
-                    </p>
-                  </div>
-                  <div className="p-3 rounded-lg bg-success/10">
-                    <TrendingUp className="w-6 h-6 text-success" />
-                  </div>
-                </div>
-              </div>
-            </Card>
-
-            <Card>
-              <div className="card-content">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Total Bills</p>
-                    <p className="text-2xl font-bold text-foreground">
-                      {reportData.totalBills || 0}
-                    </p>
-                  </div>
-                  <div className="p-3 rounded-lg bg-primary/10">
-                    <FileText className="w-6 h-6 text-primary" />
-                  </div>
-                </div>
-              </div>
-            </Card>
-
-            <Card>
-              <div className="card-content">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Paid Bills</p>
-                    <p className="text-2xl font-bold text-success">
-                      {reportData.paidBills || 0}
-                    </p>
-                  </div>
-                  <div className="p-3 rounded-lg bg-success/10">
-                    <TrendingUp className="w-6 h-6 text-success" />
-                  </div>
-                </div>
-              </div>
-            </Card>
-
-            <Card>
-              <div className="card-content">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Pending Bills</p>
-                    <p className="text-2xl font-bold text-warning">
-                      {reportData.pendingBills || 0}
-                    </p>
-                  </div>
-                  <div className="p-3 rounded-lg bg-warning/10">
-                    <Calendar className="w-6 h-6 text-warning" />
-                  </div>
-                </div>
-              </div>
-            </Card>
+          <div className="h-[350px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={revenueData} barGap={8}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis 
+                  dataKey="name" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: '#64748b', fontSize: 12 }}
+                  dy={10}
+                />
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: '#64748b', fontSize: 12 }}
+                />
+                <Tooltip 
+                  cursor={{ fill: '#f8fafc' }}
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)' }}
+                />
+                <Bar dataKey="revenue" fill="#4f66ff" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="expenses" fill="#cbd5e1" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
+        </Card>
 
-          {/* Chart Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Revenue Chart */}
-            <Card>
-              <div className="card-header">
-                <h3 className="text-lg font-semibold text-foreground">Revenue Trend</h3>
-                <p className="text-sm text-muted-foreground">
-                  Revenue over the selected period
-                </p>
-              </div>
-              <div className="card-content">
-                <div className="h-80 flex items-center justify-center text-muted-foreground">
-                  <div className="text-center">
-                    <TrendingUp className="w-12 h-12 mx-auto mb-2" />
-                    <p>Chart will be implemented with Recharts</p>
-                    <p className="text-sm">Daily revenue: {formatCurrency(5000)}</p>
-                  </div>
-                </div>
-              </div>
-            </Card>
-
-            {/* Payment Methods */}
-            <Card>
-              <div className="card-header">
-                <h3 className="text-lg font-semibold text-foreground">Payment Methods</h3>
-                <p className="text-sm text-muted-foreground">
-                  Revenue distribution by payment method
-                </p>
-              </div>
-              <div className="card-content">
-                <div className="space-y-4">
-                  {reportData.paymentMethods ? (
-                    <>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">Cash</span>
-                        <div className="text-right">
-                          <p className="font-semibold">{formatCurrency(reportData.paymentMethods.cash || 0)}</p>
-                          <Badge status="success" size="sm">45%</Badge>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">UPI</span>
-                        <div className="text-right">
-                          <p className="font-semibold">{formatCurrency(reportData.paymentMethods.upi || 0)}</p>
-                          <Badge status="primary" size="sm">35%</Badge>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">Card</span>
-                        <div className="text-right">
-                          <p className="font-semibold">{formatCurrency(reportData.paymentMethods.card || 0)}</p>
-                          <Badge status="warning" size="sm">15%</Badge>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">Credit</span>
-                        <div className="text-right">
-                          <p className="font-semibold">{formatCurrency(reportData.paymentMethods.credit || 0)}</p>
-                          <Badge status="destructive" size="sm">5%</Badge>
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="text-center py-8">
-                      <p className="text-muted-foreground">No payment data available</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </Card>
-          </div>
-
-          {/* Top Products */}
-          {reportData.topProducts && reportData.topProducts.length > 0 && (
-            <Card>
-              <div className="card-header">
-                <h3 className="text-lg font-semibold text-foreground">Top Products</h3>
-                <p className="text-sm text-muted-foreground">
-                  Best selling products this period
-                </p>
-              </div>
-              <div className="card-content">
-                <div className="space-y-3">
-                  {reportData.topProducts.slice(0, 5).map((product: any, index: number) => (
-                    <div key={index} className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium text-foreground">{product.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {product.quantitySold} units sold
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-semibold">{formatCurrency(product.revenue)}</p>
-                      </div>
-                    </div>
+        {/* Category Distribution */}
+        <Card className="border-none shadow-premium bg-white p-6">
+          <h3 className="text-lg font-bold mb-8">Sales by Category</h3>
+          <div className="h-[250px] relative">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={categoryData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={80}
+                  paddingAngle={8}
+                  dataKey="value"
+                >
+                  {categoryData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
-                </div>
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="text-center">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Total</p>
+                <p className="text-2xl font-black text-foreground">1.2K</p>
               </div>
-            </Card>
-          )}
+            </div>
+          </div>
+          <div className="mt-8 space-y-3">
+            {categoryData.map((cat) => (
+              <div key={cat.name} className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full" style={{ backgroundColor: cat.color }} />
+                  <span className="text-sm font-semibold text-slate-600">{cat.name}</span>
+                </div>
+                <span className="text-sm font-bold text-slate-800">{cat.value}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
 
-          {/* GST Summary */}
-          {reportData.gstSummary && (
-            <Card>
-              <div className="card-header">
-                <h3 className="text-lg font-semibold text-foreground">GST Summary</h3>
-                <p className="text-sm text-muted-foreground">
-                  Tax breakdown for the period
-                </p>
+      {/* Secondary Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <Card className="border-none shadow-soft bg-white p-6">
+          <h3 className="font-bold mb-6">User Acquisition Trend</h3>
+          <div className="h-[200px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={revenueData}>
+                <defs>
+                  <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.15}/>
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <Tooltip />
+                <Area type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorProfit)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+
+        <Card className="border-none shadow-soft bg-white p-6 overflow-hidden">
+          <h3 className="font-bold mb-6">Tax Liability Summary</h3>
+          <div className="space-y-6">
+            <div>
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-muted-foreground font-medium">GST Collected (Output)</span>
+                <span className="font-bold">₹12,450.00</span>
               </div>
-              <div className="card-content">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Taxable Amount</p>
-                    <p className="font-semibold">{formatCurrency(reportData.gstSummary.totalTaxableAmount)}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">CGST</p>
-                    <p className="font-semibold">{formatCurrency(reportData.gstSummary.cgst)}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">SGST</p>
-                    <p className="font-semibold">{formatCurrency(reportData.gstSummary.sgst)}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">IGST</p>
-                    <p className="font-semibold">{formatCurrency(reportData.gstSummary.igst)}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Total GST</p>
-                    <p className="font-semibold text-lg">{formatCurrency(reportData.gstSummary.totalGST)}</p>
-                  </div>
-                </div>
+              <div className="w-full h-2 bg-slate-100 rounded-full">
+                <div className="h-full w-[65%] bg-primary-500 rounded-full" />
               </div>
-            </Card>
-          )}
-        </div>
-      ) : (
-        <Card>
-          <div className="card-content">
-            <div className="text-center py-12">
-              <FileText className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-muted-foreground">Select a report type to view analytics</p>
+            </div>
+            <div>
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-muted-foreground font-medium">GST Paid (Input)</span>
+                <span className="font-bold">₹8,120.00</span>
+              </div>
+              <div className="w-full h-2 bg-slate-100 rounded-full">
+                <div className="h-full w-[45%] bg-emerald-500 rounded-full" />
+              </div>
+            </div>
+            <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between">
+              <span className="text-sm font-bold text-foreground">Estimated Tax Payable</span>
+              <span className="text-xl font-bold text-primary-600">₹4,330.00</span>
             </div>
           </div>
         </Card>
-      )}
-    </div>
+      </div>
+    </motion.div>
+  )
+}
+
+function ReportMetric({ label, value, change, isIncrease, icon: Icon }: any) {
+  return (
+    <Card className="border-none shadow-soft bg-white p-5 hover:shadow-medium transition-all group">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="p-2.5 rounded-xl bg-slate-50 text-slate-400 group-hover:text-primary-500 group-hover:bg-primary-50 transition-all">
+          <Icon className="w-5 h-5" />
+        </div>
+        <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{label}</span>
+      </div>
+      <div className="flex items-end justify-between">
+        <h3 className="text-2xl font-bold text-foreground">{value}</h3>
+        <div className={`flex items-center text-xs font-black ${isIncrease ? 'text-emerald-500' : 'text-rose-500'}`}>
+          {isIncrease ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
+          {change}
+        </div>
+      </div>
+    </Card>
   )
 }
