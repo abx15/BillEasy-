@@ -8,6 +8,12 @@ const inter = Inter({
   variable: '--font-inter'
 })
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+}
+
 export const metadata = {
   title: {
     default: 'BillEasy - Smart Billing for Every Business',
@@ -26,11 +32,6 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'BillEasy - Smart Billing for Every Business',
     description: 'Simple and powerful billing software designed for Indian small businesses',
-  },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
   },
 }
 
