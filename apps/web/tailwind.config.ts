@@ -9,32 +9,29 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // BillEasy Design System Colors
+        // BillEasy Ultra-Premium Design System
         primary: {
-          50: '#eef2ff',
-          100: '#e0e7ff',
-          200: '#c7d2fe',
-          300: '#a5b4fc',
-          400: '#818cf8',
-          500: '#6366f1', // Main brand color
-          600: '#4f46e5', // Primary dark
-          700: '#4338ca',
-          800: '#3730a3',
-          900: '#312e81',
-          950: '#1e1b4b',
+          50: '#f0f4ff',
+          100: '#e1e9ff',
+          200: '#c8d5ff',
+          300: '#a3b7ff',
+          400: '#758dff',
+          500: '#4f66ff', // Signature Royal Blue
+          600: '#3b4ae6',
+          700: '#2d37c7',
+          800: '#272e9e',
+          900: '#242a7e',
+          950: '#141749',
         },
         success: {
-          50: '#ecfdf5',
-          100: '#d1fae5',
-          200: '#a7f3d0',
-          300: '#6ee7b7',
-          400: '#34d399',
-          500: '#10b981', // Success color
-          600: '#059669',
-          700: '#047857',
-          800: '#065f46',
-          900: '#064e3b',
-          950: '#022c22',
+          50: '#f0fdf4',
+          100: '#dcfce7',
+          200: '#bbf7d0',
+          300: '#86efac',
+          400: '#4ade80',
+          500: '#22c55e', // Vibrant Emerald
+          600: '#16a34a',
+          700: '#15803d',
         },
         warning: {
           50: '#fffbeb',
@@ -42,12 +39,8 @@ const config: Config = {
           200: '#fde68a',
           300: '#fcd34d',
           400: '#fbbf24',
-          500: '#f59e0b', // Warning color
+          500: '#f59e0b', // Amber Sun
           600: '#d97706',
-          700: '#b45309',
-          800: '#92400e',
-          900: '#78350f',
-          950: '#451a03',
         },
         destructive: {
           50: '#fef2f2',
@@ -55,71 +48,51 @@ const config: Config = {
           200: '#fecaca',
           300: '#fca5a5',
           400: '#f87171',
-          500: '#ef4444', // Danger color
+          500: '#ef4444', // Modern Rose
           600: '#dc2626',
-          700: '#b91c1c',
-          800: '#991b1b',
-          900: '#7f1d1d',
-          950: '#450a0a',
         },
-        background: '#f8fafc',
-        card: '#ffffff',
-        text: '#1e293b',
-        muted: '#64748b',
-        border: '#e2e8f0',
-        input: '#e2e8f0',
-        ring: '#6366f1',
+        background: '#fcfdfe',
+        surface: {
+          50: '#ffffff',
+          100: '#f8fafc',
+          200: '#f1f5f9',
+        },
+        border: '#eef2f6',
+        ring: 'rgba(79, 102, 255, 0.2)',
       },
       borderRadius: {
-        lg: '0.75rem', // 12px
-        xl: '1rem',
-        '2xl': '1.5rem',
-      },
-      fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-      },
-      fontSize: {
-        'page-title': ['24px', { lineHeight: '32px', fontWeight: '700' }],
-        'section-title': ['18px', { lineHeight: '24px', fontWeight: '600' }],
-        'body': ['14px', { lineHeight: '20px', fontWeight: '400' }],
-        'label': ['12px', { lineHeight: '16px', fontWeight: '500' }],
-      },
-      animation: {
-        'fade-in': 'fadeIn 0.3s ease-in-out',
-        'slide-in': 'slideIn 0.3s ease-out',
-        'scale-in': 'scaleIn 0.2s ease-out',
-      },
-      keyframes: {
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
-        },
-        slideIn: {
-          '0%': { transform: 'translateY(10px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
-        },
-        scaleIn: {
-          '0%': { transform: 'scale(0.95)', opacity: '0' },
-          '100%': { transform: 'scale(1)', opacity: '1' },
-        },
-      },
-      spacing: {
-        'sidebar': '240px',
-        'topbar': '64px',
-        'page-padding': '24px',
-      },
-      maxWidth: {
-        'content': '1280px',
+        'button': '0.625rem',
+        'card': '1rem',
+        'input': '0.75rem',
       },
       boxShadow: {
-        'card': '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
-        'sidebar': '0 0 20px rgb(0 0 0 / 0.05)',
+        'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+        'medium': '0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.03)',
+        'premium': '0 20px 50px -12px rgba(0, 0, 0, 0.12)',
+        'inner-soft': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.05)',
       },
-      zIndex: {
-        'sidebar': 30,
-        'topbar': 40,
-        'modal': 50,
-        'toast': 60,
+      backgroundImage: {
+        'glass-gradient': 'linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.3) 100%)',
+        'brand-gradient': 'linear-gradient(135deg, #4f66ff 0%, #2d37c7 100%)',
+        'surface-gradient': 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+      },
+      transitionProperty: {
+        'height': 'height',
+        'spacing': 'margin, padding',
+      },
+      animation: {
+        'float': 'float 3s ease-in-out infinite',
+        'pulse-soft': 'pulseSoft 2s infinite',
+      },
+      keyframes: {
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-5px)' },
+        },
+        pulseSoft: {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.8' },
+        },
       },
     },
   },
