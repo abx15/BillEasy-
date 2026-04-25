@@ -1,0 +1,739 @@
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcrypt';
+
+const prisma = new PrismaClient();
+
+const businesses = [
+  {
+    id: '550e8400-e29b-41d4-a716-446655440000',
+    name: 'MediCare Pharmacy',
+    ownerName: 'Dr. Rajesh Kumar',
+    phone: '+91-9876543210',
+    email: 'rajesh@medicare.com',
+    address: '123 Main Street, Mumbai, Maharashtra 400001',
+    gstNumber: '27AAAPL1234C1ZV',
+    invoicePrefix: 'INV-2026'
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440001',
+    name: 'QuickHealth Medical',
+    ownerName: 'Dr. Priya Sharma',
+    phone: '+91-9876543211',
+    email: 'priya@quickhealth.com',
+    address: '456 Park Avenue, Delhi, Delhi 110001',
+    gstNumber: '27AAAPL5678C2ZV',
+    invoicePrefix: 'INV-2026'
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440002',
+    name: 'Wellness Center',
+    ownerName: 'Dr. Amit Patel',
+    phone: '+91-9876543212',
+    email: 'amit@wellness.com',
+    address: '789 Cross Road, Bangalore, Karnataka 560001',
+    gstNumber: '27AAAPL9012C3ZV',
+    invoicePrefix: 'INV-2026'
+  }
+];
+
+const users = [
+  {
+    id: '660e8400-e29b-41d4-a716-446655440000',
+    businessId: '550e8400-e29b-41d4-a716-446655440000',
+    name: 'Rajesh Kumar',
+    email: 'rajesh@medicare.com',
+    password: 'password123',
+    role: 'OWNER'
+  },
+  {
+    id: '660e8400-e29b-41d4-a716-446655440001',
+    businessId: '550e8400-e29b-41d4-a716-446655440001',
+    name: 'Priya Sharma',
+    email: 'priya@quickhealth.com',
+    password: 'password123',
+    role: 'OWNER'
+  },
+  {
+    id: '660e8400-e29b-41d4-a716-446655440002',
+    businessId: '550e8400-e29b-41d4-a716-446655440002',
+    name: 'Amit Patel',
+    email: 'amit@wellness.com',
+    password: 'password123',
+    role: 'OWNER'
+  }
+];
+
+const customers = [
+  {
+    id: '770e8400-e29b-41d4-a716-446655440000',
+    businessId: '550e8400-e29b-41d4-a716-446655440000',
+    name: 'John Doe',
+    email: 'john.doe@email.com',
+    phone: '+91-9876543210',
+    address: '123 Customer Lane, Mumbai',
+    gstNumber: '27AAAPL9999C1ZV'
+  },
+  {
+    id: '770e8400-e29b-41d4-a716-446655440001',
+    businessId: '550e8400-e29b-41d4-a716-446655440000',
+    name: 'Jane Smith',
+    email: 'jane.smith@email.com',
+    phone: '+91-9876543211',
+    address: '456 Customer Street, Mumbai',
+    gstNumber: '27AAAPL8888C1ZV'
+  },
+  {
+    id: '770e8400-e29b-41d4-a716-4466554402',
+    businessId: '550e8400-e29b-41d4-a716-446655440000',
+    name: 'Walk-in Customer'
+  },
+  {
+    id: '770e8400-e29b-41d4-a716-4466554403',
+    businessId: '550e8400-e29b-41d4-a716-446655440001',
+    name: 'Robert Johnson',
+    email: 'robert.j@email.com',
+    phone: '+91-9876543212',
+    address: '789 Customer Road, Delhi',
+    gstNumber: '27AAAPL7777C2ZV'
+  },
+  {
+    id: '770e8400-e29b-41d4-a716-4466554404',
+    businessId: '550e8400-e29b-41d4-a716-446655440001',
+    name: 'Sarah Williams',
+    email: 'sarah.w@email.com',
+    phone: '+91-9876543213',
+    address: '101 Customer Ave, Delhi',
+    gstNumber: '27AAAPL6666C2ZV'
+  }
+];
+
+const categories = [
+  {
+    id: '880e8400-e29b-41d4-a716-446655440000',
+    businessId: '550e8400-e29b-41d4-a716-446655440000',
+    name: 'Medicines',
+    description: 'Pharmaceutical medicines and drugs',
+    hsnCode: '3004',
+    gstSlab: 'TWELVE'
+  },
+  {
+    id: '880e8400-e29b-41d4-a716-446655440001',
+    businessId: '550e8400-e29b-41d4-a716-446655440000',
+    name: 'Medical Devices',
+    description: 'Medical equipment and devices',
+    hsnCode: '9018',
+    gstSlab: 'EIGHTEEN'
+  },
+  {
+    id: '880e8400-e29b-41d4-a716-4466554402',
+    businessId: '550e8400-e29b-41d4-a716-446655440000',
+    name: 'Personal Care',
+    description: 'Personal care and hygiene products',
+    hsnCode: '3304',
+    gstSlab: 'EIGHTEEN'
+  },
+  {
+    id: '880e8400-e29b-41d4-a716-4466554403',
+    businessId: '550e8400-e29b-41d4-a716-446655440000',
+    name: 'Surgical Supplies',
+    description: 'Surgical instruments and supplies',
+    hsnCode: '9019',
+    gstSlab: 'TWELVE'
+  },
+  {
+    id: '880e8400-e29b-41d4-a716-4466554404',
+    businessId: '550e8400-e29b-41d4-a716-446655440001',
+    name: 'Prescription Drugs',
+    description: 'Prescription medications',
+    hsnCode: '3004',
+    gstSlab: 'TWELVE'
+  },
+  {
+    id: '880e8400-e29b-41d4-a716-4466554405',
+    businessId: '550e8400-e29b-41d4-a716-446655440001',
+    name: 'OTC Products',
+    description: 'Over-the-counter products',
+    hsnCode: '3003',
+    gstSlab: 'EIGHTEEN'
+  },
+  {
+    id: '880e8400-e29b-41d4-a716-4466554406',
+    businessId: '550e8400-e29b-41d4-a716-446655440001',
+    name: 'Health Supplements',
+    description: 'Vitamins and supplements',
+    hsnCode: '2106',
+    gstSlab: 'EIGHTEEN'
+  },
+  {
+    id: '880e8400-e29b-41d4-a716-4466554407',
+    businessId: '550e8400-e29b-41d4-a716-446655440002',
+    name: 'Ayurvedic Medicines',
+    description: 'Traditional ayurvedic products',
+    hsnCode: '3004',
+    gstSlab: 'TWELVE'
+  },
+  {
+    id: '880e8400-e29b-41d4-a716-4466554408',
+    businessId: '550e8400-e29b-41d4-a716-446655440002',
+    name: 'Homeopathy',
+    description: 'Homeopathic medicines',
+    hsnCode: '3004',
+    gstSlab: 'TWELVE'
+  },
+  {
+    id: '880e8400-e29b-41d4-a716-4466554409',
+    businessId: '550e8400-e29b-41d4-a716-446655440002',
+    name: 'Yoga & Fitness',
+    description: 'Yoga equipment and fitness products',
+    hsnCode: '9506',
+    gstSlab: 'EIGHTEEN'
+  }
+];
+
+const products = [
+  {
+    id: '990e8400-e29b-41d4-a716-446655440000',
+    businessId: '550e8400-e29b-41d4-a716-446655440000',
+    name: 'Paracetamol 500mg',
+    description: 'Pain relief medication',
+    sku: 'PARA-500',
+    barcode: '8901234567890',
+    unit: 'pcs',
+    price: 10.50,
+    gstPercent: 18,
+    stockQuantity: 100,
+    lowStockAlert: 20,
+    categoryId: '880e8400-e29b-41d4-a716-446655440000'
+  },
+  {
+    id: '990e8400-e29b-41d4-a716-4466554401',
+    businessId: '550e8400-e29b-41d4-a716-446655440000',
+    name: 'Azithromycin 250mg',
+    description: 'Antibiotic medication',
+    sku: 'AZI-250',
+    barcode: '8901234567891',
+    unit: 'pcs',
+    price: 85.00,
+    gstPercent: 12,
+    stockQuantity: 50,
+    lowStockAlert: 10,
+    categoryId: '880e8400-e29b-41d4-a716-446655440000'
+  },
+  {
+    id: '990e8400-e29b-41d4-a716-4466554402',
+    businessId: '550e8400-e29b-41d4-a716-446655440000',
+    name: 'Blood Pressure Monitor',
+    description: 'Digital BP monitoring device',
+    sku: 'BPM-001',
+    barcode: '8901234567892',
+    unit: 'pcs',
+    price: 2500.00,
+    gstPercent: 18,
+    stockQuantity: 25,
+    lowStockAlert: 5,
+    categoryId: '880e8400-e29b-41d4-a716-4466554401'
+  },
+  {
+    id: '990e8400-e29b-41d4-a716-4466554403',
+    businessId: '550e8400-e29b-41d4-a716-446655440000',
+    name: 'Hand Sanitizer',
+    description: 'Alcohol-based hand sanitizer',
+    sku: 'HS-500',
+    barcode: '8901234567893',
+    unit: 'pcs',
+    price: 45.00,
+    gstPercent: 18,
+    stockQuantity: 200,
+    lowStockAlert: 50,
+    categoryId: '880e8400-e29b-41d4-a716-4466554402'
+  },
+  {
+    id: '990e8400-e29b-41d4-a716-4466554404',
+    businessId: '550e8400-e29b-41d4-a716-446655440000',
+    name: 'Surgical Mask',
+    description: 'Disposable surgical masks',
+    sku: 'SM-001',
+    barcode: '8901234567894',
+    unit: 'pcs',
+    price: 5.00,
+    gstPercent: 12,
+    stockQuantity: 500,
+    lowStockAlert: 100,
+    categoryId: '880e8400-e29b-41d4-a716-4466554403'
+  },
+  {
+    id: '990e8400-e29b-41d4-a716-4466554405',
+    businessId: '550e8400-e29b-41d4-a716-446655440001',
+    name: 'Amoxicillin 500mg',
+    description: 'Broad-spectrum antibiotic',
+    sku: 'AMOX-500',
+    barcode: '8901234567895',
+    unit: 'pcs',
+    price: 25.00,
+    gstPercent: 12,
+    stockQuantity: 75,
+    lowStockAlert: 15,
+    categoryId: '880e8400-e29b-41d4-a716-4466554404'
+  },
+  {
+    id: '990e8400-e29b-41d4-a716-4466554406',
+    businessId: '550e8400-e29b-41d4-a716-446655440001',
+    name: 'Vitamin C 1000mg',
+    description: 'Vitamin C supplement',
+    sku: 'VITC-1000',
+    barcode: '8901234567896',
+    unit: 'pcs',
+    price: 15.75,
+    gstPercent: 18,
+    stockQuantity: 150,
+    lowStockAlert: 30,
+    categoryId: '880e8400-e29b-41d4-a716-4466554406'
+  },
+  {
+    id: '990e8400-e29b-41d4-a716-4466554407',
+    businessId: '550e8400-e29b-41d4-a716-446655440001',
+    name: 'Pain Relief Balm',
+    description: 'Topical pain relief',
+    sku: 'PRB-50',
+    barcode: '8901234567897',
+    unit: 'pcs',
+    price: 120.00,
+    gstPercent: 18,
+    stockQuantity: 80,
+    lowStockAlert: 20,
+    categoryId: '880e8400-e29b-41d4-a716-4466554405'
+  },
+  {
+    id: '990e8400-e29b-41d4-a716-4466554408',
+    businessId: '550e8400-e29b-41d4-a716-446655440002',
+    name: 'Ashwagandha Capsules',
+    description: 'Stress relief supplement',
+    sku: 'ASH-60',
+    barcode: '8901234567898',
+    unit: 'pcs',
+    price: 35.00,
+    gstPercent: 12,
+    stockQuantity: 60,
+    lowStockAlert: 12,
+    categoryId: '880e8400-e29b-41d4-a716-4466554407'
+  },
+  {
+    id: '990e8400-e29b-41d4-a716-4466554409',
+    businessId: '550e8400-e29b-41d4-a716-446655440002',
+    name: 'Yoga Mat',
+    description: 'Non-slip yoga mat',
+    sku: 'YM-001',
+    barcode: '8901234567899',
+    unit: 'pcs',
+    price: 450.00,
+    gstPercent: 18,
+    stockQuantity: 30,
+    lowStockAlert: 5,
+    categoryId: '880e8400-e29b-41d4-a716-446655409'
+  },
+  {
+    id: '990e8400-e29b-41d4-a716-4466554410',
+    businessId: '550e8400-e29b-41d4-a716-446655440002',
+    name: 'Homeopathic Kit',
+    description: 'Basic homeopathic remedy kit',
+    sku: 'HK-001',
+    barcode: '8901234567900',
+    unit: 'pcs',
+    price: 280.00,
+    gstPercent: 12,
+    stockQuantity: 25,
+    lowStockAlert: 5,
+    categoryId: '880e8400-e29b-41d4-a716-4466554408'
+  }
+];
+
+const bills = [
+  {
+    id: 'aa0e8400-e29b-41d4-a716-446655440000',
+    businessId: '550e8400-e29b-41d4-a716-446655440000',
+    customerId: '770e8400-e29b-41d4-a716-446655440000',
+    invoiceNumber: 'INV-2026-001',
+    subtotal: 106.00,
+    discountAmount: 0.00,
+    gstAmount: 13.98,
+    totalAmount: 119.98,
+    paymentStatus: 'PAID',
+    paymentMethod: 'CASH',
+    notes: 'Regular customer'
+  },
+  {
+    id: 'aa0e8400-e29b-41d4-a716-4466554401',
+    businessId: '550e8400-e29b-41d4-a716-446655440001',
+    customerId: '770e8400-e29b-41d4-a716-4466554401',
+    invoiceNumber: 'INV-2026-002',
+    subtotal: 250.00,
+    discountAmount: 10.00,
+    gstAmount: 30.00,
+    totalAmount: 270.00,
+    paymentStatus: 'PAID',
+    paymentMethod: 'CARD',
+    notes: 'Credit card payment'
+  },
+  {
+    id: 'aa0e8400-e29b-41d4-a716-4466554402',
+    businessId: '550e8400-e29b-41d4-a716-446655440000',
+    customerId: '770e8400-e29b-41d4-a716-4466554402',
+    invoiceNumber: 'INV-2026-003',
+    subtotal: 45.00,
+    discountAmount: 0.00,
+    gstAmount: 5.40,
+    totalAmount: 50.40,
+    paymentStatus: 'PENDING',
+    notes: 'Pending payment'
+  },
+  {
+    id: 'aa0e8400-e29b-41d4-a716-4466554403',
+    businessId: '550e8400-e29b-41d4-a716-446655440001',
+    customerId: '770e8400-e29b-41d4-a716-4466554403',
+    invoiceNumber: 'INV-2026-004',
+    subtotal: 85.00,
+    discountAmount: 0.00,
+    gstAmount: 10.20,
+    totalAmount: 95.20,
+    paymentStatus: 'PAID',
+    paymentMethod: 'UPI',
+    notes: 'UPI payment'
+  },
+  {
+    id: 'aa0e8400-e29b-41d4-a716-4466554404',
+    businessId: '550e8400-e29b-41d4-a716-446655440001',
+    customerId: '770e8400-e29b-41d4-a716-4466554404',
+    invoiceNumber: 'INV-2026-005',
+    subtotal: 135.00,
+    discountAmount: 0.00,
+    gstAmount: 16.20,
+    totalAmount: 151.20,
+    paymentStatus: 'PAID',
+    paymentMethod: 'CASH',
+    notes: 'Cash payment'
+  },
+  {
+    id: 'aa0e8400-e29b-41d4-a716-4466554405',
+    businessId: '550e8400-e29b-41d4-a716-446655440001',
+    customerId: '770e8400-e29b-41d4-a716-4466554405',
+    invoiceNumber: 'INV-2026-006',
+    subtotal: 65.00,
+    discountAmount: 0.00,
+    gstAmount: 7.80,
+    totalAmount: 72.80,
+    paymentStatus: 'PARTIAL',
+    paymentMethod: 'CARD',
+    notes: 'Partial payment received'
+  },
+  {
+    id: 'aa0e8400-e29b-41d4-a716-4466554406',
+    businessId: '550e8400-e29b-41d4-a716-446655440001',
+    customerId: '770e8400-e29b-41d4-a716-4466554406',
+    invoiceNumber: 'INV-2026-007',
+    subtotal: 35.00,
+    discountAmount: 0.00,
+    gstAmount: 4.20,
+    totalAmount: 39.20,
+    paymentStatus: 'PAID',
+    paymentMethod: 'CASH',
+    notes: 'Walk-in customer'
+  }
+];
+
+const billItems = [
+  // Bill INV-2026-001 items
+  {
+    id: 'bb0e8400-e29b-41d4-a716-446655440000',
+    billId: 'aa0e8400-e29b-41d4-a716-446655440000',
+    productId: '990e8400-e29b-41d4-a716-446655440000',
+    productName: 'Paracetamol 500mg',
+    quantity: 2,
+    price: 10.50,
+    gstPercent: 18,
+    gstAmount: 3.78,
+    total: 24.78
+  },
+  {
+    id: 'bb0e8400-e29b-41d4-a716-4466554401',
+    billId: 'aa0e8400-e29b-41d4-a716-446655440000',
+    productId: '990e8400-e29b-41d4-a716-4466554401',
+    productName: 'Azithromycin 250mg',
+    quantity: 1,
+    price: 85.00,
+    gstPercent: 12,
+    gstAmount: 10.20,
+    total: 95.20
+  },
+  
+  // Bill INV-2026-002 items
+  {
+    id: 'bb0e8400-e29b-41d4-a716-4466554402',
+    billId: 'aa0e8400-e29b-41d4-a716-4466554401',
+    productId: '990e8400-e29b-41d4-a716-4466554402',
+    productName: 'Blood Pressure Monitor',
+    quantity: 1,
+    price: 2500.00,
+    gstPercent: 18,
+    gstAmount: 450.00,
+    total: 2950.00
+  },
+  
+  // Bill INV-2026-003 items
+  {
+    id: 'bb0e8400-e29b-41d4-a716-4466554403',
+    billId: 'aa0e8400-e29b-41d4-a716-4466554402',
+    productId: '990e8400-e29b-41d4-a716-44665540403',
+    productName: 'Hand Sanitizer',
+    quantity: 1,
+    price: 45.00,
+    gstPercent: 18,
+    gstAmount: 5.40,
+    total: 50.40
+  },
+  
+  // Bill INV-2026-004 items
+  {
+    id: 'bb0e8400-e29b-41d4-a716-4466554404',
+    billId: 'aa0e8400-e29b-41d4-a716-4466554403',
+    productId: '990e8400-e29b-41d4-a716-44665540405',
+    productName: 'Amoxicillin 500mg',
+    quantity: 1,
+    price: 25.00,
+    gstPercent: 12,
+    gstAmount: 3.00,
+    total: 28.00
+  },
+  {
+    id: 'bb0e8400-e29b-41d4-a716-4466554405',
+    billId: 'aa0e8400-e29b-41d4-a716-4466554403',
+    productId: '990e8400-e29b-41d4-a716-44665540406',
+    productName: 'Vitamin C 1000mg',
+    quantity: 3,
+    price: 15.75,
+    gstPercent: 18,
+    gstAmount: 7.20,
+    total: 52.20
+  },
+  
+  // Bill INV-2026-005 items
+  {
+    id: 'bb0e8400-e29b-41d4-a716-4466554406',
+    billId: 'aa0e8400-e29b-41d4-a716-4466554404',
+    productId: '990e8400-e29b-41d4-a716-44665540407',
+    productName: 'Pain Relief Balm',
+    quantity: 1,
+    price: 120.00,
+    gstPercent: 18,
+    gstAmount: 16.20,
+    total: 136.20
+  },
+  {
+    id: 'bb0e8400-e29b-41d4-a716-4466554407',
+    billId: 'aa0e8400-e29b-41d4-a716-4466554404',
+    productId: '990e8400-e29b-41d4-a716-44665540404',
+    productName: 'Surgical Mask',
+    quantity: 2,
+    price: 5.00,
+    gstPercent: 12,
+    gstAmount: 0.00,
+    total: 10.00
+  },
+  
+  // Bill INV-2026-006 items
+  {
+    id: 'bb0e8400-e29b-41d4-a716-4466554408',
+    billId: 'aa0e8400-e29b-41d4-a716-446655405',
+    productId: '990e8400-e29b-41d4-a716-44665540405',
+    productName: 'Amoxicillin 500mg',
+    quantity: 2,
+    price: 25.00,
+    gstPercent: 12,
+    gstAmount: 6.00,
+    total: 56.00
+  },
+  {
+    id: 'bb0e8400-e29b-41d4-a716-446655409',
+    billId: 'aa0e8400-e29b-41d4-a716-446655405',
+    productId: '990e8400-e29b-41d4-a716-44665540406',
+    productName: 'Vitamin C 1000mg',
+    quantity: 1,
+    price: 15.75,
+    gstPercent: 18,
+    gstAmount: 1.80,
+    total: 16.20
+  },
+  
+  // Bill INV-2026-007 items (Walk-in)
+  {
+    id: 'bb0e8400-e29b-41d4-a716-44665544010',
+    billId: 'aa0e8400-e29b-41d4-a716-4466554406',
+    productId: '990e8400-e29b-41d4-a716-4466554403',
+    productName: 'Hand Sanitizer',
+    quantity: 1,
+    price: 45.00,
+    gstPercent: 18,
+    gstAmount: 5.40,
+    total: 50.40
+  }
+];
+
+const payments = [
+  {
+    id: 'cc0e8400-e29b-41d4-a716-446655440000',
+    billId: 'aa0e8400-e29b-41d4-a716-446655440000',
+    amount: 119.98,
+    method: 'CASH',
+    paidAt: new Date('2026-01-15T10:30:00Z')
+  },
+  {
+    id: 'cc0e8400-e29b-41d4-a716-4466554401',
+    billId: 'aa0e8400-e29b-41d4-a716-4466554401',
+    amount: 270.00,
+    method: 'CARD',
+    paidAt: new Date('2026-01-16T14:45:00Z')
+  },
+  {
+    id: 'cc0e8400-e29b-41d4-a716-4466554402',
+    billId: 'aa0e8400-e29b-41d4-a716-4466554403',
+    amount: 95.20,
+    method: 'UPI',
+    paidAt: new Date('2026-01-18T11:20:00Z')
+  },
+  {
+    id: 'cc0e8400-e29b-41d4-a716-4466554403',
+    billId: 'aa0e8400-e29b-41d4-a716-4466554404',
+    amount: 151.20,
+    method: 'CASH',
+    paidAt: new Date('2026-01-19T16:15:00Z')
+  },
+  {
+    id: 'cc0e8400-e29b-41d4-a716-4466554404',
+    billId: 'aa0e8400-e29b-41d4-a716-4466554406',
+    amount: 50.40,
+    method: 'CASH',
+    paidAt: new Date('2026-01-21T09:30:00Z')
+  },
+  {
+    id: 'cc0e8400-e29b-41d4-a716-4466554405',
+    billId: 'aa0e8400-e29b-41d4-a716-4466554405',
+    amount: 36.40,
+    method: 'CARD',
+    paidAt: new Date('2026-01-22T13:45:00Z')
+  },
+  {
+    id: 'cc0e8400-e29b-41d4-a716-4466554406',
+    billId: 'aa0e8400-e29b-41d4-a716-4466554406',
+    amount: 39.20,
+    method: 'CASH',
+    paidAt: new Date('2026-01-23T10:00:00Z')
+  },
+  {
+    id: 'cc0e8400-e29b-41d4-a716-4466554407',
+    billId: 'aa0e8400-e29b-41d4-a716-4466554406',
+    amount: 39.20,
+    method: 'CASH',
+    paidAt: new Date('2026-01-23T10:00:00Z')
+  }
+];
+
+async function hashPassword(password) {
+  const saltRounds = 12;
+  return await bcrypt.hash(password, saltRounds);
+}
+
+async function main() {
+  console.log('🌱 Starting database seeding...');
+
+  try {
+    // Clear existing data
+    console.log('🗑️ Clearing existing data...');
+    await prisma.payment.deleteMany();
+    await prisma.billItem.deleteMany();
+    await prisma.bill.deleteMany();
+    await prisma.product.deleteMany();
+    await prisma.category.deleteMany();
+    await prisma.customer.deleteMany();
+    await prisma.user.deleteMany();
+    await prisma.business.deleteMany();
+
+    // Seed businesses
+    console.log('🏢 Seeding businesses...');
+    for (const business of businesses) {
+      await prisma.business.create({ data: business });
+    }
+
+    // Hash passwords and seed users
+    console.log('👤 Seeding users...');
+    for (const user of users) {
+      const hashedPassword = await hashPassword(user.password);
+      await prisma.user.create({
+        data: {
+          ...user,
+          password: hashedPassword
+        }
+      });
+    }
+
+    // Seed customers
+    console.log('👥 Seeding customers...');
+    for (const customer of customers) {
+      await prisma.customer.create({ data: customer });
+    }
+
+    // Seed categories
+    console.log('📁 Seeding categories...');
+    for (const category of categories) {
+      await prisma.category.create({ data: category });
+    }
+
+    // Seed products
+    console.log('💊 Seeding products...');
+    for (const product of products) {
+      await prisma.product.create({ data: product });
+    }
+
+    // Seed bills
+    console.log('🧾 Seeding bills...');
+    for (const bill of bills) {
+      await prisma.bill.create({ data: bill });
+    }
+
+    // Seed bill items
+    console.log('📋 Seeding bill items...');
+    for (const item of billItems) {
+      await prisma.billItem.create({ data: item });
+    }
+
+    // Seed payments
+    console.log('💳 Seeding payments...');
+    for (const payment of payments) {
+      await prisma.payment.create({ data: payment });
+    }
+
+    console.log('✅ Database seeding completed successfully!');
+    console.log('\n📊 Summary:');
+    console.log(`- Businesses: ${businesses.length}`);
+    console.log(`- Users: ${users.length}`);
+    console.log(`- Customers: ${customers.length}`);
+    console.log(`- Categories: ${categories.length}`);
+    console.log(`- Products: ${products.length}`);
+    console.log(`- Bills: ${bills.length}`);
+    console.log(`- Bill Items: ${billItems.length}`);
+    console.log(`- Payments: ${payments.length}`);
+
+  } catch (error) {
+    console.error('❌ Error seeding database:', error);
+    throw error;
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+main()
+  .then(() => {
+    console.log('🎉 Seeding completed!');
+  })
+  .catch((error) => {
+    console.error('❌ Seeding failed:', error);
+    process.exit(1);
+  });
