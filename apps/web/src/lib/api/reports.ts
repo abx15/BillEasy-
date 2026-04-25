@@ -1,4 +1,5 @@
 import { apiClient, handleApiResponse, handleApiError } from '../api'
+import { AxiosError } from 'axios'
 
 // Types
 export interface DailyReport {
@@ -114,7 +115,7 @@ export const reportsApi = {
       const response = await apiClient.get(`/reports/daily${searchParams}`)
       return handleApiResponse<DailyReport>(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -128,7 +129,7 @@ export const reportsApi = {
       const response = await apiClient.get(`/reports/monthly?${searchParams.toString()}`)
       return handleApiResponse<MonthlyReport>(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -139,7 +140,7 @@ export const reportsApi = {
       const response = await apiClient.get(`/reports/revenue${searchParams}`)
       return handleApiResponse<RevenueReport>(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -157,7 +158,7 @@ export const reportsApi = {
       const response = await apiClient.get(`/reports/top-products?${searchParams.toString()}`)
       return handleApiResponse<TopProduct[]>(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -191,7 +192,7 @@ export const reportsApi = {
       const response = await apiClient.get(`/reports/gst${searchParams}`)
       return handleApiResponse(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -207,7 +208,7 @@ export const reportsApi = {
       const blob = new Blob([response.data], { type: 'text/csv' })
       return URL.createObjectURL(blob)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -244,7 +245,7 @@ export const reportsApi = {
       const response = await apiClient.get(`/reports/customers?${searchParams.toString()}`)
       return handleApiResponse(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -282,7 +283,7 @@ export const reportsApi = {
       const response = await apiClient.get(`/reports/products?${searchParams.toString()}`)
       return handleApiResponse(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -317,7 +318,7 @@ export const reportsApi = {
       const response = await apiClient.get(`/reports/payments?${searchParams.toString()}`)
       return handleApiResponse(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 }
