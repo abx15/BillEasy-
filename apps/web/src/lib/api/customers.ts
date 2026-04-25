@@ -1,4 +1,5 @@
 import { apiClient, handleApiResponse, handleApiError } from '../api'
+import { AxiosError } from 'axios'
 
 // Types
 export interface Customer {
@@ -51,7 +52,7 @@ export const customersApi = {
       const response = await apiClient.get(`/customers?${searchParams.toString()}`)
       return handleApiResponse(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -61,7 +62,7 @@ export const customersApi = {
       const response = await apiClient.get(`/customers/${id}`)
       return handleApiResponse<Customer>(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -71,7 +72,7 @@ export const customersApi = {
       const response = await apiClient.post('/customers', data)
       return handleApiResponse<Customer>(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -81,7 +82,7 @@ export const customersApi = {
       const response = await apiClient.put(`/customers/${id}`, data)
       return handleApiResponse<Customer>(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -90,7 +91,7 @@ export const customersApi = {
     try {
       await apiClient.delete(`/customers/${id}`)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -114,7 +115,7 @@ export const customersApi = {
       const response = await apiClient.get(`/customers/${id}/bills?${searchParams.toString()}`)
       return handleApiResponse(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -128,7 +129,7 @@ export const customersApi = {
       const response = await apiClient.put(`/customers/${id}/credit`, data)
       return handleApiResponse<Customer>(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -140,7 +141,7 @@ export const customersApi = {
       const response = await apiClient.get(`/customers/search?q=${encodeURIComponent(query)}`)
       return handleApiResponse<Customer[]>(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 
@@ -157,7 +158,7 @@ export const customersApi = {
       const response = await apiClient.get(`/customers/${id}/stats`)
       return handleApiResponse(response)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiError(error as AxiosError))
     }
   },
 }
