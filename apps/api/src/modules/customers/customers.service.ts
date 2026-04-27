@@ -174,18 +174,9 @@ export class CustomersService {
           customerId,
           businessId,
         },
-        include: {
-          items: {
-            include: {
-              product: {
-                select: { name: true, sku: true },
-              },
-            },
-          },
-        },
         skip,
         take: limit,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: 'desc' }, 
       }),
       this.prisma.bill.count({
         where: {
@@ -196,7 +187,7 @@ export class CustomersService {
     ]);
 
     // Calculate total amount for this customer
-    const totalAmount = bills.reduce((sum, bill) => sum + bill.totalAmount, 0);
+    const totalAmount = bills.reduce((sum, bill) => sum + Number(bill.totalAmount), 0);
 
     return {
       data: bills,

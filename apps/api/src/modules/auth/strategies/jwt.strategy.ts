@@ -36,7 +36,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     // Remove password from response
-    const { password, ...userWithoutPassword } = user;
+    const { passwordHash, ...userWithoutPassword } = user;
 
     return {
       ...userWithoutPassword,

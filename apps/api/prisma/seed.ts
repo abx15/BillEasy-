@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, GstSlab } from '@prisma/client';
 import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
@@ -50,7 +50,7 @@ async function main() {
     data: {
       name: 'Medicines',
       businessId: business.id,
-      gstSlab: 'TWELVE',
+      gstSlab: GstSlab.TWELVE,
     }
   });
 
@@ -58,7 +58,7 @@ async function main() {
     data: {
       name: 'General',
       businessId: business.id,
-      gstSlab: 'EIGHTEEN',
+      gstSlab: GstSlab.EIGHTEEN,
     }
   });
 
@@ -70,7 +70,7 @@ async function main() {
       sku: 'MED001',
       price: 15.50,
       costPrice: 10.00,
-      gstSlab: 'TWELVE',
+      gstSlab: GstSlab.TWELVE,
       stockQuantity: 100,
       minStockLevel: 20,
       unit: 'strips',
@@ -81,7 +81,7 @@ async function main() {
       sku: 'MED002',
       price: 25.00,
       costPrice: 15.00,
-      gstSlab: 'TWELVE',
+      gstSlab: GstSlab.TWELVE,
       stockQuantity: 50,
       minStockLevel: 15,
       unit: 'strips',
@@ -93,7 +93,7 @@ async function main() {
       sku: 'GEN001',
       price: 45.00,
       costPrice: 25.00,
-      gstSlab: 'EIGHTEEN',
+      gstSlab: GstSlab.EIGHTEEN,
       stockQuantity: 60,
       minStockLevel: 20,
       unit: 'bottles',
@@ -104,7 +104,7 @@ async function main() {
       sku: 'GEN002',
       price: 10.00,
       costPrice: 5.00,
-      gstSlab: 'TWELVE',
+      gstSlab: GstSlab.TWELVE,
       stockQuantity: 200,
       minStockLevel: 50,
       unit: 'pieces',

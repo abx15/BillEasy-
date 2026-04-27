@@ -65,9 +65,9 @@ export class AuthService {
       const user = await tx.user.create({
         data: {
           businessId: business.id,
-          name: ownerName,
+          firstName: ownerName,
           email,
-          password: hashedPassword,
+          passwordHash: hashedPassword,
           role: UserRole.OWNER,
         },
       });
@@ -92,7 +92,7 @@ export class AuthService {
     }
 
     // Verify password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -180,7 +180,7 @@ export class AuthService {
     }
 
     // Remove password from response
-    const { password, ...userWithoutPassword } = user;
+    const { passwordHash, ...userWithoutPassword } = user;
 
     return userWithoutPassword;
   }

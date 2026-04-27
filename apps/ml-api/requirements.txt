@@ -1,16 +1,12 @@
 # FastAPI Requirements
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
-reportlab==4.0.7
 pydantic==2.5.0
-psycopg2-binary==2.9.9
 python-dotenv==1.0.0
 httpx==0.25.2
-qrcode[pil]==7.4.2
-pillow==10.1.0
-jinja2==3.1.2
-sqlalchemy==2.0.23
-alembic==1.12.1
+
+# ML Requirements
+numpy==1.24.3
 
 # Testing Dependencies
 pytest==7.4.3

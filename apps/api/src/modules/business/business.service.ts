@@ -71,7 +71,7 @@ export class BusinessService {
 
     try {
       // Upload to Cloudinary
-      const result = await cloudinary.uploader.upload(file.buffer, {
+      const result = await cloudinary.uploader.upload(`data:${file.mimetype};base64,${file.buffer.toString('base64')}`, {
         folder: 'billeasy/logos',
         resource_type: 'auto',
         public_id: `business_${businessId}_logo`,

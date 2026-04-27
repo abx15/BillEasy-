@@ -1,0 +1,8 @@
+{
+  "businessName": "Test Business",
+  "ownerName": "Test Owner",
+  "phone": "9876543210",
+  "email": "test@example.com",
+  "password": "Test123!",
+  "address": "123 Test Address"
+}

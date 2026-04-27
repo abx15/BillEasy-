@@ -1,5 +1,5 @@
 // Bill Factory - Create mock bills for testing
-import { PaymentStatus, PaymentMethod } from '@prisma/client';
+import { PaymentStatus } from '@prisma/client';
 
 export const createMockBillItem = (overrides: Partial<any> = {}) => ({
   id: 'bill-item-123',
@@ -29,7 +29,7 @@ export const createMockBill = (overrides: Partial<any> = {}) => ({
   igst: 0,
   total: 118.00,
   paymentStatus: PaymentStatus.PAID,
-  paymentMethod: PaymentMethod.CASH,
+  paymentMethod: 'CASH',
   notes: 'Test bill',
   createdAt: new Date('2026-01-01'),
   updatedAt: new Date('2026-01-01'),

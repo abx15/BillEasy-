@@ -1,7 +1,7 @@
 # FastAPI Main - Application entry point
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import pdf, gst, analytics, health
+from app.routers import pdf, gst, analytics, health, predict
 from app.models.schemas import HealthResponse
 from datetime import datetime
 import os
@@ -50,6 +50,7 @@ app.include_router(pdf.router, prefix="/pdf", tags=["PDF Generation"])
 app.include_router(gst.router, prefix="/gst", tags=["GST Calculator"])
 app.include_router(analytics.router, prefix="/analytics", tags=["Business Analytics"])
 app.include_router(health.router, prefix="/health", tags=["Health Check"])
+app.include_router(predict.router, prefix="/predict", tags=["ML Prediction"])
 
 @app.get("/", response_model=HealthResponse)
 async def root():
@@ -73,6 +74,7 @@ async def api_info():
             "gst": "/gst - GST calculation services", 
             "analytics": "/analytics - Business analytics",
             "health": "/health - Health checks",
+            "predict": "/predict - ML prediction services",
             "docs": "/docs - Swagger documentation",
             "redoc": "/redoc - ReDoc documentation"
         },
@@ -80,6 +82,7 @@ async def api_info():
             "Professional invoice PDF generation",
             "GST compliance (CGST/SGST/IGST)",
             "Business analytics and insights",
+            "ML prediction services",
             "Real-time processing",
             "RESTful API design"
         ]

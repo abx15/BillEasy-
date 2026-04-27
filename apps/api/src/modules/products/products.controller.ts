@@ -6,18 +6,12 @@ import {
   Put, 
   Delete, 
   Param, 
-  Query, 
   Body, 
   UseGuards 
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
-import { 
-  ProductsService, 
-  CreateProductDto, 
-  UpdateProductDto, 
-  ProductQuery, 
-  StockAdjustmentDto 
-} from './products.service';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
+import { ProductsService } from './products.service';
+import { CreateProductDto } from './dto/create-product.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser, CurrentUserPayload } from '../../common/decorators/current-user.decorator';
 
@@ -28,40 +22,16 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get all products with pagination and filters' })
+  @ApiOperation({ summary: 'Get all products' })
   @ApiBearerAuth()
-  async findAll(
-    @CurrentUser() user: CurrentUserPayload,
-    @Query() query: ProductQuery
-  ) {
-    return this.productsService.findAll(user.businessId, query);
-  }
-
-  @Post()
-  @ApiOperation({ summary: 'Create a new product' })
-  @ApiBearerAuth()
-  async create(
-    @CurrentUser() user: CurrentUserPayload,
-    @Body() createDto: CreateProductDto
-  ) {
-    return this.productsService.create(user.businessId, createDto);
-  }
-
-  @Get('search')
-  @ApiOperation({ summary: 'Search products for autocomplete' })
-  @ApiBearerAuth()
-  @ApiQuery({ name: 'q', description: 'Search query' })
-  async searchProducts(
-    @CurrentUser() user: CurrentUserPayload,
-    @Query('q') query: string
-  ) {
-    return this.productsService.searchProducts(user.businessId, query);
+  async findAll(@CurrentUser() user: CurrentUserPayload) {
+    return this.productsService.findAll(user.businessId);
   }
 
   @Get('low-stock')
-  @ApiOperation({ summary: 'Get products with low stock' })
+  @ApiOperation({ summary: 'Get low stock products' })
   @ApiBearerAuth()
-  async getLowStockProducts(@CurrentUser() user: CurrentUserPayload) {
+  async getLowStock(@CurrentUser() user: CurrentUserPayload) {
     return this.productsService.getLowStockProducts(user.businessId);
   }
 
@@ -76,6 +46,16 @@ export class ProductsController {
     return this.productsService.findOne(user.businessId, id);
   }
 
+  @Post()
+  @ApiOperation({ summary: 'Create new product' })
+  @ApiBearerAuth()
+  async create(
+    @CurrentUser() user: CurrentUserPayload,
+    @Body() createProductDto: CreateProductDto
+  ) {
+    return this.productsService.create(user.businessId, createProductDto);
+  }
+
   @Put(':id')
   @ApiOperation({ summary: 'Update product' })
   @ApiBearerAuth()
@@ -83,13 +63,13 @@ export class ProductsController {
   async update(
     @CurrentUser() user: CurrentUserPayload,
     @Param('id') id: string,
-    @Body() updateDto: UpdateProductDto
+    @Body() updateProductDto: any
   ) {
-    return this.productsService.update(user.businessId, id, updateDto);
+    return this.productsService.update(user.businessId, id, updateProductDto);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete product (soft delete)' })
+  @ApiOperation({ summary: 'Delete product' })
   @ApiBearerAuth()
   @ApiParam({ name: 'id', description: 'Product ID' })
   async remove(
@@ -97,17 +77,5 @@ export class ProductsController {
     @Param('id') id: string
   ) {
     return this.productsService.remove(user.businessId, id);
-  }
-
-  @Put(':id/stock')
-  @ApiOperation({ summary: 'Adjust product stock' })
-  @ApiBearerAuth()
-  @ApiParam({ name: 'id', description: 'Product ID' })
-  async adjustStock(
-    @CurrentUser() user: CurrentUserPayload,
-    @Param('id') id: string,
-    @Body() adjustmentDto: StockAdjustmentDto
-  ) {
-    return this.productsService.adjustStock(id, adjustmentDto);
   }
 }

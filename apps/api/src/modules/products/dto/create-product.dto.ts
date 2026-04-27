@@ -39,7 +39,7 @@ export class CreateProductDto {
   @IsNumber()
   @Min(1, { message: 'Low stock alert must be at least 1' })
   @Type(() => Number)
-  lowStockAlert?: number;
+  minStockLevel?: number;
 
   @IsOptional()
   @IsString()
