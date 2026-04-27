@@ -3,13 +3,19 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { StandardResponseInterceptor } from './common/interceptors/standard-response.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  
+  // Add global interceptor
+  app.useGlobalInterceptors(new StandardResponseInterceptor());
 
   // Enable CORS
   app.enableCors({
-    origin: ['http://localhost:3000'],
+    origin: ['http://localhost:3000', 'http://localhost:3000', 'http://localhost:3000'],
     credentials: true,
   });
 
