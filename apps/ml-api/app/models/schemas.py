@@ -130,3 +130,20 @@ class HealthResponse(BaseModel):
     service: str
     version: str = "1.0.0"
     timestamp: datetime
+
+# Prediction Schemas
+class PredictionRequest(BaseModel):
+    input: str
+    context: Optional[str] = None
+
+class PredictionResponse(BaseModel):
+    prediction: str
+    confidence: float
+    input: str
+    model_type: str
+    timestamp: str
+    processing_time_ms: float
+
+class ErrorResponse(BaseModel):
+    error: str
+    detail: str

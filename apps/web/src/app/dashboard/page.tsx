@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { 
   TrendingUp, 
   Users, 
@@ -40,11 +41,41 @@ const data = [
 ]
 
 export default function DashboardPage() {
+  const router = useRouter()
   const [loading, setLoading] = useState(true)
+  const [dashboardData, setDashboardData] = useState<any>(null)
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 800)
-    return () => clearTimeout(timer)
+    const fetchDashboardData = async () => {
+      try {
+        const token = localStorage.getItem('auth_token')
+        if (!token) {
+          router.push('/login')
+          return
+        }
+
+        const response = await fetch('http://localhost:3001/dashboard', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        })
+
+        if (response.ok) {
+          const result = await response.json()
+          setDashboardData(result.data)
+        } else {
+          setError('Failed to fetch dashboard data')
+        }
+      } catch (err) {
+        setError('Failed to fetch dashboard data')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchDashboardData()
   }, [])
 
   if (loading) {

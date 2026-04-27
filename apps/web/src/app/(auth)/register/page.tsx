@@ -16,6 +16,8 @@ import {
   ArrowRight,
   ShieldCheck,
   CheckCircle2,
+  Building2,
+  MapPin,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -24,10 +26,12 @@ import Link from "next/link";
 
 const registerSchema = z
   .object({
-    name: z.string().min(2, "Name must be at least 2 characters"),
+    businessName: z.string().min(2, "Business name must be at least 2 characters"),
+    ownerName: z.string().min(2, "Owner name must be at least 2 characters"),
     email: z.string().email("Please enter a valid email address"),
     phone: z.string().min(10, "Phone number must be at least 10 digits"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
+    address: z.string().min(5, "Address must be at least 5 characters"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -58,8 +62,30 @@ export default function RegisterPage() {
 
     try {
       console.log("Registering with:", data);
-      localStorage.setItem("auth_token", "mock-token");
-      router.push("/dashboard");
+      
+      const response = await fetch('http://localhost:3001/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          businessName: data.businessName,
+          ownerName: data.ownerName,
+          email: data.email,
+          phone: data.phone,
+          address: data.address,
+          password: data.password,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        // Successfully registered, now redirect to login
+        router.push("/login?registered=true");
+      } else {
+        setError(result.message || "Registration failed. Please try again.");
+      }
     } catch (err: any) {
       setError(err.message || "Registration failed. Please try again.");
     } finally {
@@ -143,15 +169,30 @@ export default function RegisterPage() {
 
             {/* Register Form */}
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              <div className="space-y-1.5">
+                <label className="text-sm font-semibold text-gray-700 ml-1">Business Name</label>
+                <div className="relative">
+                  <Input
+                    type="text"
+                    placeholder="Acme Corp"
+                    {...registerForm("businessName")}
+                    error={errors.businessName?.message}
+                    disabled={isLoading}
+                    className="pl-12"
+                  />
+                  <Building2 className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" />
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-gray-700 ml-1">Full Name</label>
+                  <label className="text-sm font-semibold text-gray-700 ml-1">Owner Name</label>
                   <div className="relative">
                     <Input
                       type="text"
                       placeholder="John Doe"
-                      {...registerForm("name")}
-                      error={errors.name?.message}
+                      {...registerForm("ownerName")}
+                      error={errors.ownerName?.message}
                       disabled={isLoading}
                       className="pl-12"
                     />
@@ -163,7 +204,7 @@ export default function RegisterPage() {
                   <div className="relative">
                     <Input
                       type="tel"
-                      placeholder="+91 XXXXX XXXXX"
+                      placeholder="9876543210"
                       {...registerForm("phone")}
                       error={errors.phone?.message}
                       disabled={isLoading}
@@ -190,58 +231,74 @@ export default function RegisterPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-gray-700 ml-1">Password</label>
+                <label className="text-sm font-semibold text-gray-700 ml-1">Business Address</label>
                 <div className="relative">
                   <Input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Create a strong password"
-                    {...registerForm("password")}
-                    error={errors.password?.message}
+                    type="text"
+                    placeholder="123, Main Street, City"
+                    {...registerForm("address")}
+                    error={errors.address?.message}
                     disabled={isLoading}
-                    className="pl-12 pr-12"
+                    className="pl-12"
                   />
-                  <Lock className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-3.5 text-gray-400 hover:text-gray-600 transition-colors"
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
+                  <MapPin className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" />
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-gray-700 ml-1">Confirm Password</label>
-                <div className="relative">
-                  <Input
-                    type={showConfirmPassword ? "text" : "password"}
-                    placeholder="Repeat your password"
-                    {...registerForm("confirmPassword")}
-                    error={errors.confirmPassword?.message}
-                    disabled={isLoading}
-                    className="pl-12 pr-12"
-                  />
-                  <Lock className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-4 top-3.5 text-gray-400 hover:text-gray-600 transition-colors"
-                  >
-                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-semibold text-gray-700 ml-1">Password</label>
+                  <div className="relative">
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Min 8 chars"
+                      {...registerForm("password")}
+                      error={errors.password?.message}
+                      disabled={isLoading}
+                      className="pl-12 pr-10"
+                    />
+                    <Lock className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-semibold text-gray-700 ml-1">Confirm</label>
+                  <div className="relative">
+                    <Input
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="Repeat"
+                      {...registerForm("confirmPassword")}
+                      error={errors.confirmPassword?.message}
+                      disabled={isLoading}
+                      className="pl-12 pr-10"
+                    />
+                    <Lock className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
               </div>
 
               <div className="py-2">
-                <p className="text-xs text-gray-500 leading-relaxed">
+                <p className="text-xs text-gray-500 leading-relaxed text-center">
                   By clicking "Create Account", you agree to our{" "}
                   <Link href="/terms" className="text-blue-600 font-bold hover:underline">
-                    Terms of Service
+                    Terms
                   </Link>{" "}
                   and{" "}
                   <Link href="/privacy" className="text-blue-600 font-bold hover:underline">
-                    Privacy Policy
+                    Privacy
                   </Link>.
                 </p>
               </div>

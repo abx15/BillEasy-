@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -23,6 +23,8 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirect = searchParams.get('redirect')
 
   const {
     register,
@@ -37,10 +39,31 @@ export default function LoginPage() {
     setError('')
 
     try {
-      // Simulate login logic or connect to your auth store
-      console.log('Logging in with:', data)
-      localStorage.setItem('auth_token', 'mock-token')
-      router.push('/dashboard')
+      // Call real backend API
+      const response = await fetch('http://localhost:3001/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
+
+      const result = await response.json()
+
+      if (response.ok && result.success) {
+        // Store tokens in localStorage
+        localStorage.setItem('auth_token', result.data.accessToken)
+        localStorage.setItem('refresh_token', result.data.refreshToken)
+        localStorage.setItem('user_data', JSON.stringify(result.data.user))
+        
+        // Store in cookie for middleware
+        document.cookie = `accessToken=${result.data.accessToken}; path=/; max-age=86400; SameSite=Lax`
+        
+        // Redirect to dashboard or the intended page
+        router.push(redirect || '/dashboard')
+      } else {
+        setError(result.message || 'Authentication failed. Please check your credentials.')
+      }
     } catch (err: any) {
       setError(err.message || 'Authentication failed. Please check your credentials.')
     } finally {

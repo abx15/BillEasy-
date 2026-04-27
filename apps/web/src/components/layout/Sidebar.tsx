@@ -11,7 +11,8 @@ import {
   Settings,
   LogOut,
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  Zap
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
@@ -23,6 +24,7 @@ const navigation = [
   { name: 'Customers', href: '/dashboard/customers', icon: Users },
   { name: 'Products', href: '/dashboard/products', icon: Package },
   { name: 'Reports', href: '/dashboard/reports', icon: BarChart3 },
+  { name: 'AI Insights', href: '/dashboard/ai', icon: Zap },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ]
 
