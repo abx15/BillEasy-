@@ -15,7 +15,7 @@ import {
   ShoppingCart,
   Activity
 } from 'lucide-react'
-// import { motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { 
   AreaChart, 
   Area, 
@@ -102,9 +102,14 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 lg:space-y-8">
       {/* Header */}
-      <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 p-6 mb-8">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="bg-white rounded-2xl shadow-sm border border-neutral-100 p-4 sm:p-6 lg:p-8"
+      >
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-3">
@@ -137,10 +142,15 @@ export default function DashboardPage() {
             </Link>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6"
+      >
         <StatCard 
           title="Total Revenue" 
           value="₹1,28,450" 
@@ -173,9 +183,14 @@ export default function DashboardPage() {
           icon={ShoppingCart}
           color="bg-warning"
         />
-      </div>
+      </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="grid grid-cols-1 xl:grid-cols-3 gap-6"
+      >
         {/* Main Chart */}
         <Card className="lg:col-span-2 shadow-premium border-none overflow-hidden bg-white p-6">
           <div className="flex items-center justify-between mb-8">
@@ -262,10 +277,15 @@ export default function DashboardPage() {
             </div>
           </Card>
         </div>
-      </div>
+      </motion.div>
 
       {/* Recent Bills Table Section */}
-      <div className="grid grid-cols-1 gap-6">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+        className="grid grid-cols-1 gap-6"
+      >
         <Card className="border-none shadow-soft p-0 bg-white">
           <div className="flex items-center justify-between p-6 border-b border-neutral-100">
             <h3 className="font-bold text-lg font-display">Transaction History</h3>
@@ -291,7 +311,7 @@ export default function DashboardPage() {
             </table>
           </div>
         </Card>
-      </div>
+      </motion.div>
     </div>
   )
 }
