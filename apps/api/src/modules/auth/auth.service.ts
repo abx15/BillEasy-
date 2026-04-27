@@ -78,7 +78,7 @@ export class AuthService {
     return this.generateTokens(result.user.id, result.business.id, result.user.role, result.user.email);
   }
 
-  async login(loginDto: LoginDto): Promise<AuthTokens> {
+  async login(loginDto: LoginDto) {
     const { email, password } = loginDto;
 
     // Find user with business
@@ -101,7 +101,16 @@ export class AuthService {
       throw new UnauthorizedException('Account is deactivated');
     }
 
-    return this.generateTokens(user.id, user.businessId, user.role, user.email);
+    const tokens = this.generateTokens(user.id, user.businessId, user.role, user.email);
+    
+    // Return user data without password
+    const { passwordHash, ...userWithoutPassword } = user;
+    
+    return {
+      ...tokens,
+      user: userWithoutPassword,
+      userId: user.id
+    };
   }
 
   async refreshToken(refreshToken: string): Promise<{ accessToken: string }> {

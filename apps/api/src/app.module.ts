@@ -9,6 +9,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { PaymentsModule } from './modules/payments/payments.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { AiModule } from './modules/ai/ai.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { AppController } from './app.controller';
 
@@ -24,6 +25,7 @@ import { AppController } from './app.controller';
     PaymentsModule,
     ReportsModule,
     AiModule,
+    DashboardModule,
   ],
   controllers: [AppController],
 })

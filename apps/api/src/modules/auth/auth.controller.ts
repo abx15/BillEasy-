@@ -30,10 +30,20 @@ export class AuthController {
   }
 
   @Post('login')
-  @ApiOperation({ summary: 'Login user and return tokens' })
+  @ApiOperation({ summary: 'Login user and return tokens with user info' })
   @HttpCode(HttpStatus.OK)
-  async login(@Body() loginDto: LoginValidationDto): Promise<AuthTokens> {
-    return this.authService.login(loginDto as LoginDto);
+  async login(@Body() loginDto: LoginValidationDto) {
+    const result = await this.authService.login(loginDto as LoginDto);
+    
+    return {
+      success: true,
+      data: {
+        ...result,
+        redirectUrl: '/dashboard'
+      },
+      message: 'Login successful',
+      timestamp: new Date().toISOString()
+    };
   }
 
   @Post('refresh')
