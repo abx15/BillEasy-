@@ -137,22 +137,16 @@ export default function LoginPage() {
             {/* Login Form */}
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {/* Email Field */}
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-700">Email Address</label>
-                <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="email"
-                    placeholder="Enter your email address"
-                    {...register('email')}
-                    className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-gray-50 focus:bg-white"
-                    disabled={isLoading}
-                  />
-                </div>
-                {errors.email && (
-                  <p className="text-sm text-red-600 font-medium">{errors.email.message}</p>
-                )}
-              </div>
+              <Input
+                type="email"
+                label="Email Address"
+                placeholder="Enter your email address"
+                {...register('email')}
+                error={errors.email?.message}
+                disabled={isLoading}
+                className="pl-12"
+              />
+              <Mail className="absolute left-4 top-14 w-5 h-5 text-gray-400 pointer-events-none" />
 
               {/* Password Field */}
               <div className="space-y-2">
@@ -163,25 +157,23 @@ export default function LoginPage() {
                   </Link>
                 </div>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
+                  <Input
                     type={showPassword ? 'text' : 'password'}
                     placeholder="Enter your password"
                     {...register('password')}
-                    className="w-full pl-12 pr-12 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-gray-50 focus:bg-white"
+                    error={errors.password?.message}
                     disabled={isLoading}
+                    className="pl-12 pr-12"
                   />
+                  <Lock className="absolute left-4 top-8 w-5 h-5 text-gray-400 pointer-events-none" />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    className="absolute right-4 top-8 text-gray-400 hover:text-gray-600 transition-colors"
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
-                {errors.password && (
-                  <p className="text-sm text-red-600 font-medium">{errors.password.message}</p>
-                )}
               </div>
 
               {/* Remember Me & Login Button */}

@@ -68,248 +68,238 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-white">
-      {/* Visual Side */}
-      <div className="hidden lg:flex flex-col justify-between p-12 bg-brand-gradient relative overflow-hidden text-white">
-        <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-dot-pattern" />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex">
+      {/* Left Side - Brand & Features */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 opacity-20" />
+        
+        <div className="relative z-10 flex flex-col justify-between h-full p-12 text-white">
+          {/* Logo Section */}
+          <div>
+            <Link href="/" className="inline-flex items-center gap-3 mb-16 group">
+              <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 shadow-lg group-hover:bg-white/30 transition-all">
+                <span className="font-bold text-2xl">B</span>
+              </div>
+              <span className="text-2xl font-bold tracking-tight">BillEasy</span>
+            </Link>
 
-        <div className="relative z-10">
-          <Link href="/" className="flex items-center gap-2 mb-12">
-            <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-lg flex items-center justify-center border border-white/30">
-              <span className="font-bold text-2xl">B</span>
+            {/* Hero Content */}
+            <div className="max-w-md space-y-6">
+              <h1 className="text-5xl font-bold leading-tight">
+                Start your journey <br />
+                <span className="text-white/80">with us today.</span>
+              </h1>
+              <div className="space-y-6 mt-8">
+                {[
+                  { text: 'Free 14-day premium trial', icon: ShieldCheck },
+                  { text: 'No credit card required', icon: CheckCircle2 },
+                  { text: 'Setup in less than 2 minutes', icon: ArrowRight },
+                  { text: 'Dedicated 24/7 support', icon: CheckCircle2 },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-4 bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
+                    <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                      <item.icon className="w-5 h-5" />
+                    </div>
+                    <p className="font-bold text-lg">{item.text}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-            <span className="text-2xl font-bold tracking-tight">BillEasy</span>
-          </Link>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            className="max-w-md"
-          >
-            <h2 className="text-5xl font-extrabold mb-8 leading-tight">
-              Start your journey <br />
-              <span className="text-white/70">with us today.</span>
-            </h2>
-            <div className="space-y-6">
-              {[
-                "Free 14-day premium trial",
-                "No credit card required",
-                "Setup in less than 2 minutes",
-                "Dedicated 24/7 support",
-              ].map((text, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <CheckCircle2 className="w-6 h-6 text-emerald-400" />
-                  <p className="text-lg font-medium text-white/90">{text}</p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-
-        <div className="relative z-10">
-          <p className="text-white/60 text-sm">
-            © 2026 BillEasy Inc. All rights reserved.
-          </p>
+          {/* Footer Info */}
+          <div className="relative z-10">
+            <p className="text-white/60 text-sm">
+              © 2026 BillEasy Inc. All rights reserved.
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Form Side */}
-      <div className="flex items-center justify-center p-8 sm:p-12 overflow-y-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-lg py-12"
-        >
-          <div className="mb-10 lg:hidden text-center">
-            <h1 className="text-3xl font-extrabold text-primary-600 mb-2">
-              BillEasy
-            </h1>
+      {/* Right Side - Register Form */}
+      <div className="flex-1 flex items-center justify-center p-8 lg:p-12 overflow-y-auto">
+        <div className="w-full max-w-lg py-12">
+          {/* Mobile Header */}
+          <div className="mb-10 text-center lg:hidden">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">BillEasy</h1>
+            <p className="text-gray-600">Create your account</p>
           </div>
 
-          <div className="mb-10 text-center lg:text-left">
-            <h2 className="text-4xl font-bold text-foreground mb-3">
-              Create Account
-            </h2>
-            <p className="text-muted-foreground text-lg">
-              Join thousands of businesses already using BillEasy.
-            </p>
-          </div>
+          {/* Form Container */}
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 lg:p-10">
+            {/* Desktop Header */}
+            <div className="mb-8 text-center lg:text-left">
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
+              <p className="text-gray-600 text-lg">Join thousands of businesses already using BillEasy.</p>
+            </div>
 
-          {error && (
-            <Alert variant="destructive" className="mb-8">
-              {error}
-            </Alert>
-          )}
+            {/* Error Alert */}
+            {error && (
+              <Alert variant="destructive" className="mb-6">
+                {error}
+              </Alert>
+            )}
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-foreground ml-1">
-                  Full Name
-                </label>
-                <div className="relative group">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-primary-500 transition-colors" />
-                  <input
-                    type="text"
-                    placeholder="John Doe"
-                    {...registerForm("name")}
-                    className="w-full bg-white border border-border rounded-input pl-12 pr-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary-500 transition-all shadow-inner-soft"
-                    disabled={isLoading}
-                  />
+            {/* Register Form */}
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-semibold text-gray-700 ml-1">Full Name</label>
+                  <div className="relative">
+                    <Input
+                      type="text"
+                      placeholder="John Doe"
+                      {...registerForm("name")}
+                      error={errors.name?.message}
+                      disabled={isLoading}
+                      className="pl-12"
+                    />
+                    <User className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" />
+                  </div>
                 </div>
-                {errors.name && (
-                  <p className="text-sm text-destructive font-medium">
-                    {errors.name.message}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-foreground ml-1">
-                  Phone Number
-                </label>
-                <div className="relative group">
-                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-primary-500 transition-colors" />
-                  <input
-                    type="tel"
-                    placeholder="+91 XXXXX XXXXX"
-                    {...registerForm("phone")}
-                    className="w-full bg-white border border-border rounded-input pl-12 pr-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary-500 transition-all shadow-inner-soft"
-                    disabled={isLoading}
-                  />
+                <div className="space-y-1.5">
+                  <label className="text-sm font-semibold text-gray-700 ml-1">Phone Number</label>
+                  <div className="relative">
+                    <Input
+                      type="tel"
+                      placeholder="+91 XXXXX XXXXX"
+                      {...registerForm("phone")}
+                      error={errors.phone?.message}
+                      disabled={isLoading}
+                      className="pl-12"
+                    />
+                    <Phone className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" />
+                  </div>
                 </div>
-                {errors.phone && (
-                  <p className="text-sm text-destructive font-medium">
-                    {errors.phone.message}
-                  </p>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-semibold text-gray-700 ml-1">Email Address</label>
+                <div className="relative">
+                  <Input
+                    type="email"
+                    placeholder="john@example.com"
+                    {...registerForm("email")}
+                    error={errors.email?.message}
+                    disabled={isLoading}
+                    className="pl-12"
+                  />
+                  <Mail className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-semibold text-gray-700 ml-1">Password</label>
+                <div className="relative">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Create a strong password"
+                    {...registerForm("password")}
+                    error={errors.password?.message}
+                    disabled={isLoading}
+                    className="pl-12 pr-12"
+                  />
+                  <Lock className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-3.5 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-semibold text-gray-700 ml-1">Confirm Password</label>
+                <div className="relative">
+                  <Input
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="Repeat your password"
+                    {...registerForm("confirmPassword")}
+                    error={errors.confirmPassword?.message}
+                    disabled={isLoading}
+                    className="pl-12 pr-12"
+                  />
+                  <Lock className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-4 top-3.5 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="py-2">
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  By clicking "Create Account", you agree to our{" "}
+                  <Link href="/terms" className="text-blue-600 font-bold hover:underline">
+                    Terms of Service
+                  </Link>{" "}
+                  and{" "}
+                  <Link href="/privacy" className="text-blue-600 font-bold hover:underline">
+                    Privacy Policy
+                  </Link>.
+                </p>
+              </div>
+
+              <Button
+                type="submit"
+                variant="primary"
+                className="w-full h-12 text-lg font-semibold shadow-lg hover:shadow-xl transition-all"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Creating account...
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center gap-2">
+                    Create Account
+                    <ArrowRight className="w-5 h-5" />
+                  </div>
                 )}
-              </div>
+              </Button>
+            </form>
+
+            {/* Divider */}
+            <div className="my-8 flex items-center">
+              <div className="flex-1 h-px bg-gray-200"></div>
+              <span className="px-4 text-sm text-gray-500">OR</span>
+              <div className="flex-1 h-px bg-gray-200"></div>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-foreground ml-1">
-                Email Address
-              </label>
-              <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-primary-500 transition-colors" />
-                <input
-                  type="email"
-                  placeholder="john@example.com"
-                  {...registerForm("email")}
-                  className="w-full bg-white border border-border rounded-input pl-12 pr-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary-500 transition-all shadow-inner-soft"
-                  disabled={isLoading}
-                />
-              </div>
-              {errors.email && (
-                <p className="text-sm text-destructive font-medium">
-                  {errors.email.message}
-                </p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-foreground ml-1">
-                Password
-              </label>
-              <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-primary-500 transition-colors" />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Create a strong password"
-                  {...registerForm("password")}
-                  className="w-full bg-white border border-border rounded-input pl-12 pr-12 py-3.5 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary-500 transition-all shadow-inner-soft"
-                  disabled={isLoading}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
-              </div>
-              {errors.password && (
-                <p className="text-sm text-destructive font-medium">
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-foreground ml-1">
-                Confirm Password
-              </label>
-              <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-primary-500 transition-colors" />
-                <input
-                  type={showConfirmPassword ? "text" : "password"}
-                  placeholder="Repeat your password"
-                  {...registerForm("confirmPassword")}
-                  className="w-full bg-white border border-border rounded-input pl-12 pr-12 py-3.5 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary-500 transition-all shadow-inner-soft"
-                  disabled={isLoading}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
-              </div>
-              {errors.confirmPassword && (
-                <p className="text-sm text-destructive font-medium">
-                  {errors.confirmPassword.message}
-                </p>
-              )}
-            </div>
-            <div className="py-2">
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                By clicking "Create Account", you agree to our{" "}
-                <Link
-                  href="/terms"
-                  className="text-primary-600 font-bold hover:underline"
-                >
-                  Terms of Service
-                </Link>{" "}
-                and{" "}
-                <Link
-                  href="/privacy"
-                  className="text-primary-600 font-bold hover:underline"
-                >
-                  Privacy Policy
+
+            {/* Login Link */}
+            <div className="text-center">
+              <p className="text-gray-600">
+                Already have an account?{' '}
+                <Link href="/login" className="font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+                  Sign in here
                 </Link>
-                .
               </p>
             </div>
+          </div>
 
-            <Button
-              type="submit"
-              fullWidth
-              className="py-4 shadow-brand"
-              isLoading={isLoading}
-            >
-              Create Account <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
-          </form>
-
-          <footer className="mt-10 text-center lg:text-left pt-8 border-t border-border/50">
-            <p className="text-muted-foreground">
-              Already have an account?{" "}
-              <Link
-                href="/login"
-                className="text-primary-600 font-bold hover:underline underline-offset-4 decoration-2"
-              >
-                Sign in here
-              </Link>
+          {/* Footer */}
+          <div className="mt-8 text-center space-y-2">
+            <p className="text-sm text-gray-500">
+              © 2026 BillEasy™. All rights reserved.
             </p>
-          </footer>
-        </motion.div>
+            <div className="flex items-center justify-center gap-4 text-xs text-gray-400">
+              <a href="#" className="hover:text-gray-600 transition-colors">Privacy Policy</a>
+              <span>•</span>
+              <a href="#" className="hover:text-gray-600 transition-colors">Terms of Service</a>
+              <span>•</span>
+              <a href="#" className="hover:text-gray-600 transition-colors">Contact Support</a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
+;
 }

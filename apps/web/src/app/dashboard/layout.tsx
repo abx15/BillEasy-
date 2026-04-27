@@ -13,7 +13,7 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="h-screen flex flex-col lg:flex-row bg-slate-50 overflow-hidden">
+    <div className="h-screen flex flex-col lg:flex-row bg-background overflow-hidden">
       {/* Mobile overlay */}
       <AnimatePresence>
         {sidebarOpen && (
@@ -40,7 +40,7 @@ export default function DashboardLayout({
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0 bg-slate-50/50">
+      <div className="flex-1 flex flex-col min-w-0 bg-muted/30">
         <Topbar onMenuClick={() => setSidebarOpen(true)} />
         
         <main className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar">

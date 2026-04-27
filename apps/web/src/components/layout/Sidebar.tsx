@@ -38,14 +38,14 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
   }
 
   return (
-    <div className="h-full flex flex-col bg-white border-r border-slate-100 shadow-premium w-[280px]">
+    <div className="h-full flex flex-col bg-white border-r border-neutral-100 shadow-premium w-[280px]">
       {/* Brand Header */}
       <div className="p-8 flex items-center justify-between">
         <Link href="/dashboard" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-2xl bg-primary-600 flex items-center justify-center shadow-brand transform transition-transform group-hover:scale-105">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center shadow-lg transform transition-transform group-hover:scale-105">
             <span className="text-white font-black text-xl">B</span>
           </div>
-          <span className="text-xl font-black text-slate-900 tracking-tight">BillEasy</span>
+          <span className="text-xl font-black text-neutral-900 tracking-tight">BillEasy</span>
         </Link>
       </div>
 
@@ -62,20 +62,20 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
               className={cn(
                 'group flex items-center justify-between px-4 py-3 rounded-2xl transition-all duration-300',
                 isActive 
-                  ? 'bg-primary-50 text-primary-600 shadow-sm' 
-                  : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                  ? 'bg-primary-light text-primary shadow-sm' 
+                  : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900'
               )}
             >
               <div className="flex items-center gap-3">
                 <item.icon className={cn(
                   'w-5 h-5 transition-colors duration-300',
-                  isActive ? 'text-primary-600' : 'text-slate-400 group-hover:text-slate-600'
+                  isActive ? 'text-primary' : 'text-neutral-300 group-hover:text-neutral-500'
                 )} />
                 <span className="font-bold text-sm tracking-tight">{item.name}</span>
               </div>
               {isActive && (
                 <motion.div layoutId="active-indicator">
-                  <ChevronRight className="w-4 h-4 text-primary-500" />
+                  <ChevronRight className="w-4 h-4 text-primary" />
                 </motion.div>
               )}
             </Link>
@@ -83,13 +83,13 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
         })}
       </nav>
 
-      {/* Upgrade Banner or Footer */}
-      <div className="p-4 mx-4 mb-4 rounded-2xl bg-slate-900 text-white relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-24 h-24 bg-primary-500/20 blur-3xl -mr-12 -mt-12" />
+      {/* Upgrade Banner */}
+      <div className="p-4 mx-4 mb-4 rounded-2xl bg-neutral-900 text-white relative overflow-hidden group shadow-xl">
+        <div className="absolute top-0 right-0 w-24 h-24 bg-primary/20 blur-3xl -mr-12 -mt-12" />
         <div className="relative z-10 flex flex-col gap-3">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-5 h-5 text-primary-400" />
-            <span className="text-xs font-bold tracking-widest uppercase text-white/70">PRO VERSION</span>
+            <ShieldCheck className="w-5 h-5 text-primary" />
+            <span className="text-[10px] font-black tracking-widest uppercase text-white/50">PRO VERSION</span>
           </div>
           <p className="text-sm font-bold">Unlimited Invoicing</p>
           <button className="text-[10px] uppercase font-black tracking-widest py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors">
@@ -99,10 +99,10 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
       </div>
 
       {/* Logout */}
-      <div className="p-6 border-t border-slate-100">
+      <div className="p-6 border-t border-neutral-100">
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-4 py-3 w-full text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all duration-300 font-bold text-sm"
+          className="flex items-center gap-3 px-4 py-3 w-full text-neutral-400 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all duration-300 font-bold text-sm"
         >
           <LogOut className="w-5 h-5" />
           <span>Sign Out</span>
